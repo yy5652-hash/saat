@@ -130,7 +130,7 @@ The planner recovers 76% of what perfect foresight would. The headroom left abov
 Requirements: macOS or Linux, [uv](https://docs.astral.sh/uv/), [Foundry](https://book.getfoundry.sh/) (`forge`, `anvil`).
 
 ```bash
-git clone --recursive <this repo> && cd climatechain-saat
+git clone --recursive https://github.com/yy5652-hash/saat && cd saat
 uv sync
 (cd contracts && forge test)          # 22 contract tests
 uv run pytest                         # 19 Python tests, including a full flow on Anvil

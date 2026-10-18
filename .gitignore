@@ -14,3 +14,5 @@ film/work/
 *.mp4
 *.srt
 film/*-frames.jpg
+film/
+.claude/

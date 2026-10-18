@@ -103,7 +103,7 @@ function drawIssue(v, committed) {
       datasets: [
         { type: "line", label: "Upper envelope (99th pct.)", data: v.hours.map((h) => h.upper_kwh), borderColor: C.ink3, borderDash: [5, 4], borderWidth: 1.5, pointRadius: 0, fill: false },
         { type: "line", label: "Expected from weather", data: v.hours.map((h) => h.expected_kwh), borderColor: C.teal, borderWidth: 2, pointRadius: 0, tension: .3 },
-        { type: "bar", label: "Meter claim", data: v.hours.map((h) => h.claimed_kwh), backgroundColor: v.hours.map((h) => (h.held ? C.held : C.ok)), ...BAR },
+        { type: "bar", label: "Meter claim (green issued, red held)", data: v.hours.map((h) => h.claimed_kwh), backgroundColor: v.hours.map((h) => (h.held ? C.held : C.ok)), ...BAR },
       ],
     },
     options: { plugins: { tooltip: { callbacks: { afterLabel: (ctx) => (ctx.dataset.type === "bar" && v.hours[ctx.dataIndex].held ? "held: " + v.hours[ctx.dataIndex].reason : "") } } },
