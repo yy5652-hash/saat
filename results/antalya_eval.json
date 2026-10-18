@@ -1,0 +1,42 @@
+{
+  "year": 2025,
+  "hours": 8759,
+  "forecast_skill": {
+    "solar_kwh": {
+      "ai_mae_pct_of_capacity": 2.03,
+      "physics_on_forecast_mae_pct": 2.13,
+      "persistence_mae_pct": 3.47
+    },
+    "wind_kwh": {
+      "ai_mae_pct_of_capacity": 4.91,
+      "physics_on_forecast_mae_pct": 7.0,
+      "persistence_mae_pct": 11.19
+    }
+  },
+  "consumers": {
+    "hotel_kwh": {
+      "annual_mwh": 1728.9,
+      "annual_claim": 1.0,
+      "hourly_cfe_alone": 0.6285
+    },
+    "campus_kwh": {
+      "annual_mwh": 737.9,
+      "annual_claim": 1.0,
+      "hourly_cfe_alone": 0.6795
+    }
+  },
+  "community": {
+    "annual_claim": 1.0,
+    "hourly_cfe_separate": 0.6438,
+    "hourly_cfe_p2p_pooled": 0.6626,
+    "hourly_cfe_p2p_plus_ai_shift": 0.6967,
+    "hourly_cfe_p2p_plus_perfect_shift": 0.7077,
+    "energy_shifted_share": 0.045,
+    "flexible_share_of_load": 0.135
+  },
+  "notes": {
+    "supply": "modelled from ERA5 hourly weather at the plant coordinates (pvlib PVWatts; generic turbine curve)",
+    "forecasts": "Open-Meteo previous-runs API, *_previous_day1, i.e. issued the day before",
+    "loads": "synthetic, temperature-driven hotel and office profiles"
+  }
+}
