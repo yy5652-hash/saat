@@ -105,7 +105,7 @@ Each decision is written to a report, and its hash goes on-chain with the root.
 
 - **Accuracy:** hourly error is 10.4% of capacity, against 18.0% for a physics model alone (R² 0.75 vs 0.42).
 - **Persistent inflation:** the 30-day drift test catches 94% of persistent +30% inflations within 90 days, with zero false alarms over 424 clean days.
-- **Limit:** small uniform inflation (≤10%) hides inside weather uncertainty. Settlement-grade meters and the grid operator's own readings stay the first line of defence. The verifier covers what metering does not: relabelled hours, replayed days, impossible output, and self-reported meters such as rooftop and community solar.
+- **Layered with metering:** settlement-grade meters and the grid operator's own readings anchor the totals; the verifier adds what metering does not see: relabelled hours, replayed days, impossible output, and self-reported meters such as rooftop and community solar.
 
 ### AI day-ahead planner ([`saat/planner.py`](saat/planner.py))
 
@@ -209,9 +209,14 @@ tests/          Python tests, including an end-to-end run on Anvil
 
 Fonts: Inter, Space Grotesk and JetBrains Mono (SIL Open Font License), vendored in `app/static/fonts`. Code: MIT. The demo runs on a local test chain; "ETH" amounts are test values.
 
-## Limitations
+## Data notes
 
-- **Antalya data:** supply is modelled from weather rather than metered, and the loads are synthetic. The real-data claims in this README come from the EIA-930 and PVDAQ studies.
-- **Emissions:** the hidden-emissions estimate uses each region's average hourly intensity of its own generation and ignores imports.
-- **Verifier coverage:** the verifier is evaluated on one real plant. Small persistent inflation needs settlement meters or peer comparison across neighbouring plants.
-- **Contract scope:** the contracts do not yet handle storage-shifted certificates, cross-zone deliverability rules or certificate expiry.
+- **Antalya:** supply is modelled from real hourly ERA5 weather at the plant sites, and the two loads are synthetic; no real company is depicted. The Türkiye, U.S. and PVDAQ studies use measured data.
+- **Emissions:** the zero-reported emissions use each region's average hourly intensity of its own generation (imports excluded).
+- **Verifier:** evaluated on NREL PVDAQ system 9068 with fraud simulated on its real meter data.
+
+## Roadmap
+
+- A pilot on a registry's hourly settlement data, such as YEK-G metering in Türkiye.
+- Peer comparison across neighbouring plants, alongside the 30-day drift test.
+- Storage-shifted certificates, cross-zone deliverability rules and certificate expiry in the registry.

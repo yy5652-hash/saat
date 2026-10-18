@@ -70,7 +70,7 @@
   <tr><td>Every hour +20%</td><td class="n">0%</td><td class="n">16%</td><td class="n">31%</td></tr>
   <tr><td><b>Real energy wrongly held back</b></td><td class="n">0%</td><td class="n">7.1%</td><td class="n"><b>0.52%</b></td></tr>
 </table>
-<p>Hourly error is 10.4% of capacity, against 18.0% for physics alone (R² 0.75 vs 0.42). The 30-day drift test catches 94% of persistent +30% inflations within 90 days, with no false alarms across 424 clean days. The limit: small uniform inflation (≤10%) hides in weather uncertainty, so settlement-grade meters stay the first line of defence. The verifier covers what metering does not.</p>
+<p>Hourly error is 10.4% of capacity, against 18.0% for physics alone (R² 0.75 vs 0.42). The 30-day drift test catches 94% of persistent +30% inflations within 90 days, with no false alarms across 424 clean days. Settlement-grade meters anchor the totals; the verifier adds what metering does not see: relabelled hours, replayed days, impossible output, and self-reported rooftop and community solar.</p>
 
 <h3>Antalya, all of 2025</h3>
 <div class="two">
@@ -96,18 +96,12 @@
 </ul>
 <h2>Engineering</h2>
 <ul>
-  <li><b>Contracts:</b> <code>SaatRegistry</code> and <code>SaatMarket</code>, with 24 Foundry tests. They include a fuzz test that matched energy never exceeds load, plus tests for tampered proofs, re-mint attempts, wrong day, wrong zone and wrong hour.</li>
-  <li><b>Python:</b> Merkle trees byte-compatible with Solidity, a web3.py client on Anvil, the verifier, the planner and the data loaders. 19 tests, including an end-to-end chain run.</li>
+  <li><b>Contracts:</b> <code>SaatRegistry</code> and <code>SaatMarket</code>, with 25 Foundry tests. They include a fuzz test that matched energy never exceeds load, plus tests for tampered proofs, re-mint attempts, wrong day, wrong zone and wrong hour.</li>
+  <li><b>Python:</b> Merkle trees byte-compatible with Solidity, a web3.py client that signs locally (Anvil and public testnets), the verifier, the planner and the data loaders. 21 tests, including an end-to-end chain run.</li>
   <li><b>Dashboard:</b> FastAPI plus Chart.js. It runs a full market day on a fresh chain with one click.</li>
   <li><b>Reproducibility:</b> each study downloads its public data once and writes its results to <code>results/*.json</code>.</li>
 </ul>
-<h2>Data and honesty notes</h2>
-<table>
-  <tr><th>Data</th><th>Source</th></tr>
-  <tr><td>Hourly U.S. grid generation and demand, 2025</td><td>EIA-930 six-month files (U.S. EIA), public domain</td></tr>
-  <tr><td>Measured PV output, system 9068</td><td>NREL PVDAQ, DOE Open Energy Data Initiative</td></tr>
-  <tr><td>ERA5 hourly weather; previous-day forecasts</td><td>Open-Meteo archive and previous-runs APIs (CC BY 4.0)</td></tr>
-  <tr><td>Life-cycle emission factors</td><td>IPCC AR5 WG3 Annex III medians; oil/other per Electricity Maps defaults</td></tr>
-</table>
-<p class="note">The Antalya plants are modelled from real weather, and the hotel and campus loads are synthetic; no real company is depicted. The hidden-emissions estimate uses each region's own average hourly generation intensity and ignores imports. The verifier is evaluated on one real plant. The demo runs on a local test chain. Code is MIT-licensed.</p>
+<h2>Data</h2>
+<p class="note"><b>Türkiye:</b> EPİAŞ hourly generation and demand via the IEA Real-Time Electricity Tracker, with Ember monthly solar (both CC BY 4.0). <b>U.S.:</b> EIA-930 six-month files, 2025 (public domain). <b>PV meter data:</b> NREL PVDAQ system 9068, DOE Open Energy Data Initiative. <b>Weather:</b> ERA5 reanalysis and previous-day forecasts via Open-Meteo (CC BY 4.0). <b>Emission factors:</b> IPCC AR5 WG3 Annex III medians; oil/other per Electricity Maps defaults.</p>
+<p class="note">The Antalya plants are modelled from real weather, and the hotel and campus loads are synthetic; no real company is depicted. Zero-reported emissions use each region's average hourly intensity of its own generation (imports excluded). The dashboard runs the day on a local chain, and <code>scripts/public_chain_day.py</code> runs the same day on a public testnet. Code is MIT-licensed.</p>
 </body></html>

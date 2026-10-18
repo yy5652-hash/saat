@@ -392,7 +392,7 @@ async function drawEvidence() {
     $("ev-ver").innerHTML = `<tr><th>Fraud (simulated on real data)</th><th class="n">Capacity check</th><th class="n">Saat AI blocks</th></tr>` +
       show.map(([k, l]) => { const x = v.attacks[k]["Saat AI"].fake_energy_blocked; return `<tr><td>${l}</td><td class="n">${pct(v.attacks[k]["nameplate check"].fake_energy_blocked, 0)}</td><td class="n"><b>${pct(x, 0)}</b><span class="bar" style="width:${Math.round(x * 70)}px"></span></td></tr>`; }).join("") +
       `<tr><td>Real energy wrongly held back</td><td class="n">0%</td><td class="n">${pct(v.clean["Saat AI"].clean_energy_held, 2)}</td></tr>`;
-    $("ev-ver-text").innerHTML = `The share of fake energy that never becomes a certificate. The model's hourly error is <b>${v.accuracy.ml_mae_pct_of_ac}%</b> of capacity, against ${v.accuracy.physics_mae_pct_of_ac}% for physics alone. Small uniform inflation (≤10%) hides in weather noise, so settlement-grade meters stay the first line of defence.`;
+    $("ev-ver-text").innerHTML = `The share of fake energy that never becomes a certificate. The model's hourly error is <b>${v.accuracy.ml_mae_pct_of_ac}%</b> of capacity, against ${v.accuracy.physics_mae_pct_of_ac}% for physics alone. It holds back <b>${(v.clean["Saat AI"].clean_energy_held * 100).toFixed(2)}%</b> of real energy, against ${(v.clean["physics bound"].clean_energy_held * 100).toFixed(1)}% for physics rules alone.`;
   }
   const a = ev.antalya_eval;
   if (a) {
