@@ -57,11 +57,12 @@ flowchart LR
 - Days follow the zone's **local market day** (Türkiye: UTC+3), the way the market settles.
 - The utility commits each consumer's 24 hourly readings once per day, and **the whole day's load enters the denominator immediately**, so a consumer cannot raise its score by proving only its good hours.
 - `retire` burns certificates only if they come from **the same hour** and **the same zone** as the proven load, and never more than that hour's load. A noon certificate cannot cover 21:00, which reverts with `HourMismatch`.
+- `settleDay` proves all 24 hourly loads and retires each hour's certificates in **one transaction** under the same rules; one bad hour reverts the whole day. On the demo day it settles the hotel (24 proofs, 35 retirements) for 1.17M gas, 30% less than 24 separate transactions.
 - `claimSummary(meter, fromDay, toDay)` returns load, matched energy and the hourly score in basis points, computed on-chain.
 
 `SaatMarket`: a seller lists one hour's certificates at a price per Wh. The certificates sit in escrow until bought or cancelled, so a listed hour cannot be sold twice. It is guarded against reentrancy.
 
-There are 22 Foundry tests, including a fuzz test that matched energy never exceeds load and a test that a tampered amount fails its proof.
+There are 24 Foundry tests, including a fuzz test that matched energy never exceeds load, a test that a tampered amount fails its proof, and a test that a wrong hour inside `settleDay` reverts the whole day.
 
 ### AI issuance verifier ([`saat/verifier.py`](saat/verifier.py))
 
@@ -132,7 +133,7 @@ Requirements: macOS or Linux, [uv](https://docs.astral.sh/uv/), [Foundry](https:
 ```bash
 git clone --recursive https://github.com/yy5652-hash/saat && cd saat
 uv sync
-(cd contracts && forge test)          # 22 contract tests
+(cd contracts && forge test)          # 24 contract tests
 uv run pytest                         # 19 Python tests, including a full flow on Anvil
 uv run uvicorn app.server:app --port 8417
 ```
@@ -156,7 +157,7 @@ uv run python analysis/antalya_eval.py    # Antalya community, 2025
 
 **Scale:**
 - **Issuance cost:** one transaction per plant per day; minting is lazy, so only certificates that are traded or retired ever touch the chain.
-- **Measured gas:** commit 99k per plant-day, mint 40–50k per hour in a batch, retire ~66k per hour.
+- **Measured gas:** commit 99k per plant-day, mint 40–50k per hour in a batch, settle a consumer's whole day in one transaction (1.17M gas for 24 hours and 35 retirements, about 49k per hour).
 - **Where it can run:** the contracts are plain Solidity 0.8 and OpenZeppelin 5, deployable on any EVM chain, including low-fee rollups or a permissioned network run by a registry.
 
 ## Repository
@@ -166,7 +167,7 @@ contracts/      SaatRegistry, SaatMarket, Foundry tests
 saat/           merkle (byte-compatible with Solidity), chain client, verifier, planner,
                 pvmodel, scenario (Antalya), matching, data sources
 analysis/       the three studies; results/ holds their outputs
-app/            FastAPI server and dashboard (Chart.js vendored)
+app/            FastAPI server and dashboard (Chart.js and fonts vendored, works offline)
 tests/          Python tests, including an end-to-end run on Anvil
 ```
 
@@ -179,7 +180,7 @@ tests/          Python tests, including an end-to-end run on Anvil
 | Hourly reanalysis weather (ERA5) and previous-day forecasts | Open-Meteo archive and previous-runs APIs | CC BY 4.0, non-commercial API use |
 | Life-cycle emission factors | IPCC AR5 WG3 Annex III medians; oil/other per Electricity Maps defaults | cited |
 
-Code: MIT. The demo runs on a local test chain; "ETH" amounts are test values.
+Fonts: Inter, Space Grotesk and JetBrains Mono (SIL Open Font License), vendored in `app/static/fonts`. Code: MIT. The demo runs on a local test chain; "ETH" amounts are test values.
 
 ## Limitations
 

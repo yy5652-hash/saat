@@ -302,6 +302,59 @@ contract SaatTest is Test {
         reg.retire(HOTEL_METER, hourOf(DAY, 12), ids, amounts);
     }
 
+    function _settleInputs(bytes32[] memory loadLeaves, uint64[] memory load, uint256 id, uint64 h, uint256 wh)
+        internal
+        pure
+        returns (uint64[] memory hrs, uint64[] memory loads, bytes32[][] memory proofs, uint256[][] memory ids, uint256[][] memory amts)
+    {
+        hrs = new uint64[](24);
+        loads = new uint64[](24);
+        proofs = new bytes32[][](24);
+        ids = new uint256[][](24);
+        amts = new uint256[][](24);
+        for (uint64 k = 0; k < 24; k++) {
+            hrs[k] = uint64(DAY) * 24 + k;
+            loads[k] = load[k];
+            proofs[k] = Merkle.proof(loadLeaves, k);
+            if (k == h) {
+                ids[k] = new uint256[](1);
+                amts[k] = new uint256[](1);
+                ids[k][0] = id;
+                amts[k][0] = wh;
+            }
+        }
+    }
+
+    function test_SettleDayInOneTransaction() public {
+        uint256 id = buyHourFromCoop(12, 150_000);
+        (bytes32[] memory loadLeaves, uint64[] memory load) = commitHotelDay(DAY);
+        (uint64[] memory hrs, uint64[] memory loads, bytes32[][] memory proofs, uint256[][] memory ids, uint256[][] memory amts) =
+            _settleInputs(loadLeaves, load, id, 12, 150_000);
+        vm.prank(hotel);
+        reg.settleDay(HOTEL_METER, hrs, loads, proofs, ids, amts);
+        (uint256 loadWh, uint256 matchedWh, uint256 bps) = reg.claimSummary(HOTEL_METER, DAY, DAY);
+        assertEq(loadWh, 24 * 200_000);
+        assertEq(matchedWh, 150_000);
+        assertEq(bps, uint256(150_000 * 10_000) / (24 * 200_000));
+        for (uint64 k = 0; k < 24; k++) {
+            (,, bool proven) = reg.slots(HOTEL_METER, hourOf(DAY, k));
+            assertTrue(proven);
+        }
+    }
+
+    function test_SettleDayRevertsWholeDayOnWrongHour() public {
+        uint256 id = buyHourFromCoop(12, 150_000);
+        (bytes32[] memory loadLeaves, uint64[] memory load) = commitHotelDay(DAY);
+        // The noon certificate is placed in the 21:00 slot.
+        (uint64[] memory hrs, uint64[] memory loads, bytes32[][] memory proofs, uint256[][] memory ids, uint256[][] memory amts) =
+            _settleInputs(loadLeaves, load, id, 21, 150_000);
+        vm.prank(hotel);
+        vm.expectRevert(SaatRegistry.HourMismatch.selector);
+        reg.settleDay(HOTEL_METER, hrs, loads, proofs, ids, amts);
+        (,, bool proven) = reg.slots(HOTEL_METER, hourOf(DAY, 0));
+        assertFalse(proven);
+    }
+
     function test_ConsumptionCommittedOncePerDay() public {
         commitHotelDay(DAY);
         vm.prank(issuer);

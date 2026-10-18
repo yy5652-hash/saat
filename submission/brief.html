@@ -52,7 +52,7 @@
   <tr><td><b>2 · Merkle issuance</b></td><td><code>commitGeneration</code>: one root per plant per local market day (~99k gas for 24 hours). Certificates are minted lazily as ERC-1155 tokens <code>id = plant ∥ hour</code>, 1 unit = 1 Wh, <b>once per plant-hour</b>, never above registered capacity.</td></tr>
   <tr><td><b>3 · P2P market</b></td><td><code>SaatMarket</code>: escrowed listings of one hour's certificates, so a listed hour cannot also be sold elsewhere. Scarce hours carry higher prices. Reentrancy-guarded.</td></tr>
   <tr><td><b>4 · AI day-ahead planner</b></td><td>Using only the previous day's forecast (Open-Meteo previous-runs archive), gradient boosting forecasts tomorrow's certificates hour by hour. Flexible load moves into forecast-surplus hours and the shortfall is bought from the cheapest listings.</td></tr>
-  <tr><td><b>5 · Hourly retirement</b></td><td>The utility commits the consumer's 24 readings, and the day's full load enters the denominator at once. <code>retire</code> burns only certificates of the <b>same hour and zone</b>, capped at that hour's load (a noon certificate against 21:00 reverts with <code>HourMismatch</code>). <code>claimSummary</code> returns the hourly score on-chain.</td></tr>
+  <tr><td><b>5 · Hourly retirement</b></td><td>The utility commits the consumer's 24 readings, and the day's full load enters the denominator at once. <code>retire</code> burns only certificates of the <b>same hour and zone</b>, capped at that hour's load (a noon certificate against 21:00 reverts with <code>HourMismatch</code>). <code>settleDay</code> does all 24 hours in one transaction. <code>claimSummary</code> returns the hourly score on-chain.</td></tr>
 </table>
 <img class="shot" src="../docs/claim.png" alt="Claim step">
 <p class="note">The demo day (10 July 2025) on a live local chain: the hotel's contract alone covers 59.9% of its load hour by hour. After P2P buying and the AI load shift, the on-chain hourly score is 84.6%.</p>
@@ -93,11 +93,11 @@
   <li><b>Registries and grid operators.</b> In Türkiye, EPİAŞ already issues YEK-G guarantees of origin, one per MWh. Saat lets the issuer commit one root per plant-day from settlement data it already holds. It adds hourly granularity, local market days (UTC+3) and a public guard against double issuance and double claims.</li>
   <li><b>Generators and energy communities</b> sell the hours that are worth most. Rooftop and cooperative solar without settlement-grade metering are where the AI verifier matters most.</li>
   <li><b>Corporate buyers</b> (hotels, data centres, exporters facing carbon border rules) buy the hours they are short of, shift load, and publish a claim anyone can recompute from the chain.</li>
-  <li><b>Cost.</b> One transaction per plant per day. Minting is lazy, so only certificates that are traded or retired touch the chain. Measured gas: commit 99k per plant-day, mint 40–50k per hour in a batch, retire about 66k per hour. Plain Solidity 0.8 and OpenZeppelin 5 run on any EVM chain, a low-fee rollup or a registry-run permissioned network.</li>
+  <li><b>Cost.</b> One transaction per plant per day. Minting is lazy, so only certificates that are traded or retired touch the chain. Measured gas: commit 99k per plant-day, mint 40–50k per hour in a batch, and a consumer's whole day settles in one transaction (1.17M gas for 24 hours and 35 retirements, 30% less than hour by hour). Plain Solidity 0.8 and OpenZeppelin 5 run on any EVM chain, a low-fee rollup or a registry-run permissioned network.</li>
 </ul>
 <h2>Engineering</h2>
 <ul>
-  <li><b>Contracts:</b> <code>SaatRegistry</code> and <code>SaatMarket</code>, with 22 Foundry tests. They include a fuzz test that matched energy never exceeds load, plus tests for tampered proofs, re-mint attempts, wrong day, wrong zone and wrong hour.</li>
+  <li><b>Contracts:</b> <code>SaatRegistry</code> and <code>SaatMarket</code>, with 24 Foundry tests. They include a fuzz test that matched energy never exceeds load, plus tests for tampered proofs, re-mint attempts, wrong day, wrong zone and wrong hour.</li>
   <li><b>Python:</b> Merkle trees byte-compatible with Solidity, a web3.py client on Anvil, the verifier, the planner and the data loaders. 19 tests, including an end-to-end chain run.</li>
   <li><b>Dashboard:</b> FastAPI plus Chart.js. It runs a full market day on a fresh chain with one click.</li>
   <li><b>Reproducibility:</b> each study downloads its public data once and writes its results to <code>results/*.json</code>.</li>

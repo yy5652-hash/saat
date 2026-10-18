@@ -1,5 +1,7 @@
 """Thin client for the Saat contracts on a local Anvil chain (or any JSON-RPC endpoint)."""
 
+from __future__ import annotations  # the class defines a method named `list`
+
 import json
 import os
 import shutil
@@ -158,6 +160,16 @@ class Saat:
         i = load_tree.hours.index(hour)
         fn = self.registry.functions.proveAndRetire(meter_id, hour, load_tree.whs[i], load_tree.proof(i), ids, amounts)
         return self._send(fn, owner)
+
+    def settle_day(self, owner, meter_id, load_tree: DayTree, ids: list[list[int]], amounts: list[list[int]]) -> Receipt:
+        """Prove all of a day's hourly loads and retire each hour's certificates in one transaction."""
+        fn = self.registry.functions.settleDay(
+            meter_id, load_tree.hours, load_tree.whs, [load_tree.proof(i) for i in range(len(load_tree.hours))], ids, amounts
+        )
+        return self._send(fn, owner)
+
+    def balances(self, owner, cert_ids: list[int]) -> list[int]:
+        return self.registry.functions.balanceOfBatch([owner] * len(cert_ids), cert_ids).call()
 
     def claim_summary(self, meter_id, from_day, to_day) -> dict:
         load, matched, bps = self.registry.functions.claimSummary(meter_id, from_day, to_day).call()

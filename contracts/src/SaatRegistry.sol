@@ -220,6 +220,24 @@ contract SaatRegistry is ERC1155, Ownable {
         retire(meterId, hour, ids, amounts);
     }
 
+    /// @notice Settle a market day in one transaction: prove each hour's load and retire that hour's
+    ///         certificates under exactly the rules of `retire`. One bad hour reverts the whole day.
+    function settleDay(
+        uint32 meterId,
+        uint64[] calldata hours_,
+        uint64[] calldata loads,
+        bytes32[][] calldata proofs,
+        uint256[][] calldata ids,
+        uint256[][] calldata amounts
+    ) external {
+        uint256 n = hours_.length;
+        if (loads.length != n || proofs.length != n || ids.length != n || amounts.length != n) revert LengthMismatch();
+        for (uint256 i = 0; i < n; i++) {
+            proveLoad(meterId, hours_[i], loads[i], proofs[i]);
+            if (ids[i].length > 0) retire(meterId, hours_[i], ids[i], amounts[i]);
+        }
+    }
+
     /// @notice Hourly carbon-free energy score over committed days, in basis points.
     function claimSummary(uint32 meterId, uint32 fromDay, uint32 toDay)
         external

@@ -325,26 +325,26 @@ class Demo:
         tree = DayTree(KIND_CONSUMPTION, meter_id, self.hour_idx, load)
         r = self.saat.commit_consumption(self.who["utility"], meter_id, self.mday, tree, keccak(text=f"meter-{meter_id}-{self.day}"))
         self._tx("utility", f"commit {m['key']} consumption root (24 hourly readings)", r, root="0x" + tree.root.hex())
-        per_hour = []
-        gas = 0
+        # One batched read of every (plant, hour) balance, then one transaction for the whole day.
+        cids = [self.saat.cert_id(did, h) for h in self.hour_idx for did in DEVICES]
+        held = dict(zip(cids, self.saat.balances(owner, cids)))
+        ids, amounts, per_hour = [], [], []
         for i, h in enumerate(self.hour_idx):
-            ids, amts = [], []
-            room = load[i]
+            room, hid, hamt = load[i], [], []
             for did in DEVICES:
                 cid = self.saat.cert_id(did, h)
-                bal = self.saat.balance(owner, cid)
-                take = min(bal, room)
+                take = min(held[cid], room)
                 if take > 0:
-                    ids.append(cid)
-                    amts.append(take)
+                    hid.append(cid)
+                    hamt.append(take)
                     room -= take
-            matched = sum(amts)
-            if ids:
-                rr = self.saat.prove_and_retire(owner, meter_id, h, tree, ids, amts)
-                gas += rr.gas
-            per_hour.append({"label": f"{(self.hours[i] + pd.Timedelta(hours=UTC_OFFSET)).hour:02d}:00", "load_kwh": round(load[i] / 1000, 1), "matched_kwh": round(matched / 1000, 1)})
+            ids.append(hid)
+            amounts.append(hamt)
+            per_hour.append({"label": f"{(self.hours[i] + pd.Timedelta(hours=UTC_OFFSET)).hour:02d}:00", "load_kwh": round(load[i] / 1000, 1), "matched_kwh": round(sum(hamt) / 1000, 1)})
+        rr = self.saat.settle_day(owner, meter_id, tree, ids, amounts)
+        gas = rr.gas
         summary = self.saat.claim_summary(meter_id, self.mday, self.mday)
-        self._tx(m["owner"], f"retire certificates hour by hour; on-chain hourly score {summary['cfe']:.1%}", None, gas_total=gas)
+        self._tx(m["owner"], f"settle the day in one transaction (24 proofs, {sum(len(x) for x in ids)} retirements); on-chain hourly score {summary['cfe']:.1%}", rr)
         return {"meter": meter_id, "hours": per_hour, **summary, "retire_gas": gas}
 
     def attempt_mismatch(self, meter_id: int) -> dict:

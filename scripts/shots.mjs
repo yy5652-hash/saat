@@ -28,7 +28,8 @@ await send('Page.enable');
 await send('Emulation.setDeviceMetricsOverride', { width: 1600, height: 1000, deviceScaleFactor: 2, mobile: false });
 await send('Page.navigate', { url: `http://127.0.0.1:${PORT}/` });
 await until(() => js("typeof S !== 'undefined' && S.series !== null && document.querySelector('#ev-ver tr') !== null"), 'page');
-await js('Chart.defaults.animation = false; drawGap(); true');
+await js('Chart.defaults.animation = false; true');
+await wait(2200);
 await js(`(async () => {
   document.getElementById('issue-tamper').value = 'night'; await verifyClick();
   await issueDevice(2); await issueDevice(1);
@@ -39,7 +40,7 @@ await js(`(async () => {
   drawBook(await api('/api/book'));
   await settleClick(7); await mismatchClick(); await refresh();
   return true; })()`);
-await wait(500);
+await wait(2600); // let the ring animations finish
 mkdirSync(join(ROOT, 'docs'), { recursive: true });
 async function shot(name, clip) {
   const r = await send('Page.captureScreenshot', { format: 'png', clip: { ...clip, scale: 1 }, captureBeyondViewport: true });

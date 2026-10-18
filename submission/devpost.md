@@ -35,7 +35,7 @@ Türkiye hosts COP31 in Antalya this November. Antalya's hotels, like data centr
 2. **Merkle-committed hourly certificates.** One transaction per plant per day commits 24 hourly readings as a Merkle root (about 99k gas). Each hour is minted lazily as an ERC-1155 token (`id = plant ∥ hour`, 1 unit = 1 Wh), and **each plant-hour can be minted only once**. Registry days follow the local market day (Türkiye: UTC+3).
 3. **Peer-to-peer market.** Generators list each surplus hour in escrow, so a listed hour cannot be sold twice. Scarce evening and night hours command higher prices.
 4. **AI day-ahead planner.** Using only the weather forecast issued the day before, gradient boosting forecasts tomorrow's certificates hour by hour. The planner moves flexible load (laundry, pool pumps, water heating, shuttle charging) into surplus hours and buys the remaining shortfall from the cheapest listings.
-5. **Hourly retirement and on-chain score.** The utility commits the consumer's 24 meter readings. The consumer proves each hour and burns certificates **from the same hour and the same zone, never above that hour's load**. The whole day's load counts toward the score even for hours the consumer never proves. `claimSummary` returns the hourly carbon-free score, computed on-chain. A noon certificate presented against 9 p.m. load reverts with `HourMismatch`.
+5. **Hourly retirement and on-chain score.** The utility commits the consumer's 24 meter readings. In **one transaction** (`settleDay`), the consumer proves every hour and burns certificates **from the same hour and the same zone, never above that hour's load**. The whole day's load counts toward the score even for hours the consumer never proves. `claimSummary` returns the hourly carbon-free score, computed on-chain. A noon certificate presented against 9 p.m. load reverts with `HourMismatch`.
 
 ### Results
 - **Verifier on a real plant.** We tested on NREL PVDAQ system 9068, a 4.7 MW tracker plant in Colorado: trained on 2017–2022, calibrated on 2023, tested on 16 unseen months with fraud simulated on the real data. The verifier blocks:
@@ -57,17 +57,17 @@ Türkiye hosts COP31 in Antalya this November. Antalya's hotels, like data centr
 - **Registries and grid operators:** in Türkiye, EPİAŞ already issues YEK-G guarantees of origin, one per MWh. Saat lets them commit one root per plant-day from the settlement data they already hold. It adds hourly granularity and a public guard against double issuance and double claims.
 - **Generators and energy cooperatives:** sell the hours that are worth most. Rooftop and community solar without settlement-grade meters are where the AI verifier matters most.
 - **Corporate buyers** (hotels, data centres, exporters facing carbon border rules): buy the hours they are short of, shift load, and publish a claim anyone can recompute from the chain.
-- **Scale:** one transaction per plant per day, lazy minting, and plain Solidity/OpenZeppelin deployable on any EVM chain, including low-fee rollups or a registry-run permissioned network. Measured gas: commit 99k per plant-day, retire about 66k per hour.
+- **Scale:** one transaction per plant per day, lazy minting, and plain Solidity/OpenZeppelin deployable on any EVM chain, including low-fee rollups or a registry-run permissioned network. Measured gas: commit 99k per plant-day; a consumer's whole day settles in one transaction (1.17M gas for 24 hours and 35 retirements, 30% less than hour by hour).
 
 ### How we built it
-- **Contracts:** Solidity 0.8.28 with OpenZeppelin 5.4 (ERC-1155, MerkleProof, ReentrancyGuard), tested with Foundry. 22 tests, including a fuzz test that matched energy never exceeds load.
+- **Contracts:** Solidity 0.8.28 with OpenZeppelin 5.4 (ERC-1155, MerkleProof, ReentrancyGuard), tested with Foundry. 24 tests, including a fuzz test that matched energy never exceeds load.
 - **Off-chain:** a Python Merkle builder that is byte-compatible with the contracts, and a web3.py client on Anvil.
 - **AI:** pvlib physics features, scikit-learn quantile gradient boosting for the verifier and gradient boosting for the planner. 19 Python tests, including an end-to-end run on a local chain.
 - **Data:**
   - EIA-930 six-month files (2025);
   - PVDAQ via the DOE Open Energy Data Initiative;
   - ERA5 reanalysis and the previous-day forecast archive via Open-Meteo.
-- **Dashboard:** a FastAPI server and a Chart.js dashboard that runs a whole market day on a fresh chain.
+- **Dashboard:** a FastAPI server and a dark "control room" dashboard. Its signature 24-hour ring shows each hour's certificates against load, and it runs a whole market day on a fresh chain.
 
 ### Challenges
 - **Proving the gap.** Annual claims and hourly matching are easy to talk about but need real hourly data. We processed every 2025 EIA-930 hour for 22 regions.
