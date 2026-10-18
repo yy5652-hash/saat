@@ -282,7 +282,7 @@ function drawBook(rows) {
       html += `<div class="cell" style="background:linear-gradient(180deg, ${rgba(hex, 0.55 + 0.45 * t)}, ${rgba(hex, 0.25 + 0.35 * t)});box-shadow:0 0 ${Math.round(4 + 14 * t)}px ${rgba(hex, 0.25 + 0.4 * t)}" title="${r.label} · ${r.kwh} kWh · ${r.price_eth_per_mwh.toFixed(4)} test ETH/MWh">${Math.round(r.kwh)}<span class="p" style="transform:scaleX(${(0.15 + 0.85 * t).toFixed(2)})"></span></div>`;
     }
   }
-  $("book").innerHTML = html + `<div class="legend"><span>kWh listed per hour · bar under each lot = its price</span><span>cheaper ← → scarcer (evening, night)</span></div>`;
+  $("book").innerHTML = html + `<div class="legend"><span>kWh listed per hour · bar under each lot = its price</span><span>cheaper ← → scarcer (no sun, little wind)</span></div>`;
 }
 
 function factsDeliver(d) {
