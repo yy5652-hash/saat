@@ -36,7 +36,7 @@
 </div>
 
 <h2>The problem</h2>
-<p>Companies call themselves "100% renewable" because they buy certificates equal to their <b>annual</b> electricity use. Electricity is consumed <b>hour by hour</b>, and a solar MWh from noon cannot have powered a hotel at 9 p.m. Using EIA-930 hourly data for 2025, we measured the gap for a 24/7 consumer that buys wind and solar certificates equal to 100% of its annual use from its own region's fleet:</p>
+<p>Companies call themselves "100% renewable" because they buy certificates equal to their <b>annual</b> electricity use. Electricity is consumed <b>hour by hour</b>, and a solar MWh from noon cannot have powered a hotel at 9 p.m. On <b>Türkiye's real 2025 grid</b> (EPİAŞ hourly generation via the IEA Real-Time Electricity Tracker), a 24/7 consumer holding wind and solar certificates for 100% of its annual use is matched only <b>72.3%</b> hour by hour, and 128 kg CO₂e/MWh is reported as zero. Using EIA-930 hourly data for 2025, we measured the same gap across U.S. grids:</p>
 <div class="kpis">
   <div class="kpi"><b>65.5%</b><span>median load matched in the same hour, across 22 U.S. balancing authorities (range 41–82%)</span></div>
   <div class="kpi"><b>124 kg</b><span>CO₂e per MWh consumed (median) drawn from the grid but reported as zero</span></div>
@@ -72,19 +72,18 @@
 </table>
 <p>Hourly error is 10.4% of capacity, against 18.0% for physics alone (R² 0.75 vs 0.42). The 30-day drift test catches 94% of persistent +30% inflations within 90 days, with no false alarms across 424 clean days. The limit: small uniform inflation (≤10%) hides in weather uncertainty, so settlement-grade meters stay the first line of defence. The verifier covers what metering does not.</p>
 
-<h3>Antalya community, all of 2025</h3>
+<h3>Antalya, all of 2025</h3>
 <div class="two">
   <div>
-    <p>The community is a 2 MW community solar plant (Antalya) and a 6 MW Aegean wind share (Karaburun), supplying a seaside hotel and an office campus in Türkiye's zone. Supply is modelled from real ERA5 weather; the loads are synthetic. The forecasters were trained on 2024 only.</p>
-    <p>The wind forecaster's error is 4.9% of capacity, against 7.0% for physics on the forecast and 11.2% for persistence.</p>
+    <p>The community is a 2 MW community solar plant (Antalya) and a 6 MW Aegean wind share (Karaburun), supplying a seaside hotel and an office campus in Türkiye's zone. Supply is modelled from real ERA5 weather; the loads are synthetic; the forecasters were trained on 2024 only.</p>
+    <p>The hotel does every day what it does on the demo day. Its median day is 85%, so the demo day is typical. With only a quarter of the plants' spare output on offer, the community still reaches 77.6%. The wind forecaster's error is 4.9% of capacity, against 11.2% for persistence.</p>
   </div>
   <table>
-    <tr><th>Hourly matched, 2025</th><th class="n">%</th></tr>
+    <tr><th>The hotel, hourly matched, 2025</th><th class="n">%</th></tr>
     <tr><td>Annual claim</td><td class="n">100</td></tr>
-    <tr><td>Each consumer alone</td><td class="n">64.4</td></tr>
-    <tr><td>+ P2P hourly trading</td><td class="n">66.3</td></tr>
-    <tr><td>+ AI day-ahead shifting</td><td class="n"><b>69.7</b></td></tr>
-    <tr><td>Perfect foresight (bound)</td><td class="n">70.8</td></tr>
+    <tr><td>Contract only</td><td class="n">62.9</td></tr>
+    <tr><td>+ AI day-ahead shifting</td><td class="n">67.5</td></tr>
+    <tr><td>+ hourly market (18% more certificates)</td><td class="n"><b>82.8</b></td></tr>
   </table>
 </div>
 

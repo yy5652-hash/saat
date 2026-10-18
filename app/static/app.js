@@ -364,6 +364,18 @@ async function mismatchClick() {
 
 async function drawEvidence() {
   const ev = await api("/api/evidence");
+  const tr = ev.turkiye_gap;
+  if (tr) {
+    const row = (pname) => tr.table.find((r) => r.load === "flat 24/7" && r.portfolio === pname);
+    $("ev-tr-text").innerHTML = `On Türkiye's real hourly generation, a 24/7 consumer holding wind and solar certificates for 100% of its annual use is matched only <b>${pct(tr.flat_wind_solar_hourly_cfe)}</b> hour by hour. The rest, about <b>${tr.flat_wind_solar_hidden_kg_per_mwh} kg CO₂e/MWh</b> on a ${tr.grid_kg_per_mwh} kg/MWh grid, is reported as zero. Reaching 90% would take ${tr.flat_wind_solar_volume_for_90pct.toFixed(1)}× the annual volume.`;
+    const labels = ["Wind + solar", "Wind only", "Solar only", "U.S. median (22 regions)"];
+    const vals = [row("wind+solar").hourly_cfe, row("wind").hourly_cfe, row("solar").hourly_cfe, tr.us_median_hourly_cfe].map((x) => x * 100);
+    chart("c-ev-tr", {
+      type: "bar",
+      data: { labels, datasets: [{ data: vals, backgroundColor: [C.teal, C.wind, C.solar, "rgba(242,239,230,0.35)"], maxBarThickness: 24, borderRadius: { topRight: 5, bottomRight: 5 }, borderSkipped: false }] },
+      options: { indexAxis: "y", plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => ctx.raw.toFixed(1) + "% matched hour by hour" } } }, scales: { x: axis("% of a flat load matched hour by hour, 100% annual certificates", { min: 0, max: 100 }), y: { grid: { display: false }, border: { display: false } } } },
+    });
+  }
   const g = ev.hourly_gap;
   if (g) {
     $("ev-gap-text").innerHTML = `Across <b>${g.balancing_authorities}</b> U.S. balancing authorities, buying 100% of annual use in wind and solar certificates covers a median of only <b>${pct(g.median_hourly_cfe)}</b> hour by hour (range ${pct(g.range_hourly_cfe[0], 0)}–${pct(g.range_hourly_cfe[1], 0)}). The rest, a median <b>${g.median_hidden_kg_per_mwh} kg CO₂e/MWh</b>, is reported as zero. Red bars are regions below half.`;
@@ -384,14 +396,14 @@ async function drawEvidence() {
   }
   const a = ev.antalya_eval;
   if (a) {
-    const c = a.community;
-    $("ev-ant-text").innerHTML = `The hotel and the campus together, every hour of 2025. Day-ahead AI shifting recovers <b>${Math.round(((c.hourly_cfe_p2p_plus_ai_shift - c.hourly_cfe_p2p_pooled) / (c.hourly_cfe_p2p_plus_perfect_shift - c.hourly_cfe_p2p_pooled)) * 100)}%</b> of what perfect foresight would. The wind forecaster's error is ${a.forecast_skill.wind_kwh.ai_mae_pct_of_capacity}% of capacity, against ${a.forecast_skill.wind_kwh.persistence_mae_pct}% for persistence.`;
-    const labels = ["Annual claim", "Hourly, each alone", "+ P2P hourly trading", "+ AI day-ahead shift", "Perfect foresight"];
-    const vals = [1, c.hourly_cfe_separate, c.hourly_cfe_p2p_pooled, c.hourly_cfe_p2p_plus_ai_shift, c.hourly_cfe_p2p_plus_perfect_shift].map((x) => x * 100);
+    const h = a.hotel, mk = a.community.with_hourly_market;
+    $("ev-ant-text").innerHTML = `The hotel, every hour of 2025, doing what it does on the demo day. With day-ahead shifting and the hourly market it is matched <b>${pct(h.hourly_cfe_with_ai_shift_and_market)}</b> hour by hour, buying ${pct(h.bought_share_of_annual_load, 0)} more certificates, only in the hours it is short. Its median day is ${pct(h.daily_cfe_p10_p50_p90[1], 0)}, so the demo day is typical. If the community could reach only a quarter of the plants' spare output, it would still be ${pct(mk["0.25"].hourly_cfe)}.`;
+    const labels = ["Annual claim", "Hourly, contract only", "+ AI day-ahead shift", "+ hourly market"];
+    const vals = [1, h.hourly_cfe_contract_only, h.hourly_cfe_with_ai_shift, h.hourly_cfe_with_ai_shift_and_market].map((x) => x * 100);
     chart("c-ev-ant", {
       type: "bar",
-      data: { labels, datasets: [{ data: vals, backgroundColor: [C.teal, C.teal, C.teal, C.purple, C.teal], maxBarThickness: 22, borderRadius: { topRight: 5, bottomRight: 5 }, borderSkipped: false }] },
-      options: { indexAxis: "y", plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => ctx.raw.toFixed(1) + "%" } } }, scales: { x: axis("% of load", { min: 50, max: 100 }), y: { grid: { display: false }, border: { display: false } } } },
+      data: { labels, datasets: [{ data: vals, backgroundColor: [C.teal, C.red, C.teal, C.purple], maxBarThickness: 24, borderRadius: { topRight: 5, bottomRight: 5 }, borderSkipped: false }] },
+      options: { indexAxis: "y", plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => ctx.raw.toFixed(1) + "%" } } }, scales: { x: axis("% of the hotel's 2025 load", { min: 50, max: 100 }), y: { grid: { display: false }, border: { display: false } } } },
     });
   }
 }

@@ -24,6 +24,7 @@
 Türkiye hosts COP31 in Antalya this November. Antalya's hotels, like data centres and factories everywhere, can call themselves "100% renewable" by buying certificates equal to their annual use. But a solar megawatt-hour from a June noon did not power a hotel at 9 p.m. in July. We wanted to measure how big that gap really is, and build the infrastructure that closes it: certificates per hour, which can be checked, traded and claimed honestly.
 
 ### The problem, measured
+- **On Türkiye's real grid:** we used EPİAŞ real-time generation for every hour of 2025, via the IEA Real-Time Electricity Tracker, with solar scaled to Ember's national totals. A 24/7 consumer holding wind and solar certificates for 100% of its annual use is matched only **72% hour by hour**. The other 128 kg CO₂e/MWh is reported as zero.
 - **Across U.S. grids:** we used EIA-930 hourly data for 2025 across 22 U.S. balancing authorities. A consumer that buys wind and solar certificates equal to 100% of its annual use is matched only **65.5% hour by hour** (median; range 41–82%).
 - **Hidden emissions:** the rest, a median **124 kg CO₂e per MWh consumed**, is reported as zero.
 - **Solar-only buyers** reach just 43.7%.
@@ -45,12 +46,12 @@ Türkiye hosts COP31 in Antalya this November. Antalya's hotels, like data centr
   - 63% of a +50% inflation.
 
   It holds back only **0.52%** of genuine energy. A capacity check, which is what registries typically apply today, blocks none of them. Its hourly error is 10.4% of capacity, against 18.0% for physics alone. The limit we found: small, steady inflation (≤10%) hides inside weather noise, so settlement meters remain the first line of defence. A 30-day drift test catches 94% of persistent +30% inflation within 90 days, with no false alarms in 424 clean days.
-- **Antalya community, all of 2025.** The community is a 2 MW community solar plant and a 6 MW Aegean wind share supplying a seaside hotel and an office campus. Supply is modelled from real weather; the loads are synthetic. Hour by hour:
-  - each consumer alone: 64.4%;
-  - with P2P trading of surplus hours: 66.3%;
-  - plus AI day-ahead shifting: **69.7%**.
+- **Antalya, all of 2025.** The community is a 2 MW community solar plant and a 6 MW Aegean wind share supplying a seaside hotel and an office campus. Supply is modelled from real weather; the loads are synthetic. The hotel does every day what it does on the demo day:
+  - contract only: 62.9% matched hour by hour;
+  - with AI day-ahead shifting: 67.5%;
+  - plus buying its forecast shortfall on the hourly market: **82.8%**, buying 18% more certificates, only in the hours it is short.
 
-  That is 76% of what perfect foresight would achieve. The wind forecaster's error is 4.9% of capacity, against 11.2% for persistence.
+  Its median day is 85%, so the demo day is typical, not lucky. The wind forecaster's error is 4.9% of capacity, against 11.2% for persistence. Even with access to only a quarter of the plants' spare output, the community reaches 77.6%.
 - **Demo day (10 July 2025) on a live chain.** The hotel's contract alone covers 59.9% of its load hour by hour. After trading and planning, the on-chain score is **84.6%**.
 
 ### Who uses it, and how it scales

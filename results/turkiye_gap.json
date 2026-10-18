@@ -1,0 +1,100 @@
+{
+  "data": "EPİAŞ real-time generation by source and demand via the IEA Real-Time Electricity Tracker (CC BY 4.0), 2025, hourly; national solar scaled to Ember monthly totals",
+  "annual_twh": {
+    "wind": 39.25,
+    "solar": 37.26,
+    "solar_licensed": 7.73,
+    "hydro": 57.22,
+    "gas": 78.36,
+    "coal": 121.41,
+    "geothermal": 10.65,
+    "demand": 352.51
+  },
+  "grid_kg_per_mwh": 408.0,
+  "flat_wind_solar_hourly_cfe": 0.7232,
+  "flat_wind_solar_hidden_kg_per_mwh": 128.0,
+  "flat_wind_solar_surplus_share": 0.2768,
+  "flat_wind_solar_volume_for_90pct": 2.103226364109334,
+  "us_median_hourly_cfe": 0.655,
+  "table": [
+    {
+      "load": "flat 24/7",
+      "portfolio": "wind+solar",
+      "annual_claim": 1.0,
+      "hourly_cfe": 0.7232,
+      "surplus_share": 0.2768,
+      "hidden_kg_per_mwh": 127.6333,
+      "volume_for_90pct": 2.103226364109334
+    },
+    {
+      "load": "flat 24/7",
+      "portfolio": "solar",
+      "annual_claim": 1.0,
+      "hourly_cfe": 0.4346,
+      "surplus_share": 0.5654,
+      "hidden_kg_per_mwh": 252.9569,
+      "volume_for_90pct": null
+    },
+    {
+      "load": "flat 24/7",
+      "portfolio": "wind",
+      "annual_claim": 1.0,
+      "hourly_cfe": 0.7748,
+      "surplus_share": 0.2252,
+      "hidden_kg_per_mwh": 97.2797,
+      "volume_for_90pct": 1.6845812698526519
+    },
+    {
+      "load": "flat 24/7",
+      "portfolio": "wind+solar, licensed solar only (wind-heavy sensitivity)",
+      "annual_claim": 1.0,
+      "hourly_cfe": 0.8017,
+      "surplus_share": 0.1983,
+      "hidden_kg_per_mwh": 90.4895,
+      "volume_for_90pct": 1.4540976053380117
+    },
+    {
+      "load": "national demand shape",
+      "portfolio": "wind+solar",
+      "annual_claim": 1.0,
+      "hourly_cfe": 0.7441,
+      "surplus_share": 0.2559,
+      "hidden_kg_per_mwh": 116.5979,
+      "volume_for_90pct": 1.9168577976909962
+    },
+    {
+      "load": "national demand shape",
+      "portfolio": "solar",
+      "annual_claim": 1.0,
+      "hourly_cfe": 0.4567,
+      "surplus_share": 0.5433,
+      "hidden_kg_per_mwh": 241.4159,
+      "volume_for_90pct": null
+    },
+    {
+      "load": "national demand shape",
+      "portfolio": "wind",
+      "annual_claim": 1.0,
+      "hourly_cfe": 0.7804,
+      "surplus_share": 0.2196,
+      "hidden_kg_per_mwh": 93.2623,
+      "volume_for_90pct": 1.6562232849855985
+    },
+    {
+      "load": "national demand shape",
+      "portfolio": "wind+solar, licensed solar only (wind-heavy sensitivity)",
+      "annual_claim": 1.0,
+      "hourly_cfe": 0.8142,
+      "surplus_share": 0.1858,
+      "hidden_kg_per_mwh": 83.4882,
+      "volume_for_90pct": 1.375732787402022
+    }
+  ],
+  "validation": {
+    "hourly_r_modelled_aegean_wind_vs_national_wind": 0.668,
+    "daily_r_modelled_aegean_wind_vs_national_wind": 0.741,
+    "hourly_r_modelled_antalya_solar_vs_national_solar": 0.909,
+    "daily_r_modelled_antalya_solar_vs_national_solar": 0.688,
+    "hotel_contract_only_cfe_with_real_national_profiles": 0.7632
+  }
+}

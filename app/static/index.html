@@ -116,6 +116,14 @@
       <div class="kicker">Evidence on real data</div>
       <h2>What the numbers look like outside the demo</h2>
       <div class="ev-grid">
+        <div class="ev" id="ev-tr">
+          <div class="ev-text">
+            <h3>Türkiye's real grid, 2025</h3>
+            <p id="ev-tr-text"></p>
+            <p class="note">EPİAŞ real-time generation by source, via the IEA Real-Time Electricity Tracker (CC BY 4.0), every hour of 2025. Solar is scaled from licensed plants to Ember's monthly national totals.</p>
+          </div>
+          <div class="chart"><canvas id="c-ev-tr"></canvas></div>
+        </div>
         <div class="ev">
           <div class="ev-text">
             <h3>The gap is real across U.S. grids</h3>
@@ -136,7 +144,7 @@
           <div class="ev-text">
             <h3>Antalya, all of 2025</h3>
             <p id="ev-ant-text"></p>
-            <p class="note">Plans use the forecasts archived the day before (Open-Meteo previous-day runs); the forecasters were trained on 2024 only.</p>
+            <p class="note">Plans use the forecasts archived the day before (Open-Meteo previous-day runs); the forecasters were trained on 2024 only. The market is the two plants' uncontracted output, listed hour by hour.</p>
           </div>
           <div class="chart"><canvas id="c-ev-ant"></canvas></div>
         </div>

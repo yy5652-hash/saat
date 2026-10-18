@@ -431,6 +431,39 @@ contract SaatTest is Test {
         market.buy{value: 300_001 * 1 gwei}(listingId, 300_001);
     }
 
+    function test_MarketBatchListAndBuy() public {
+        (bytes32 root, bytes32[] memory leaves, uint64[] memory whs) = commitSolarDay(SOLAR, DAY);
+        uint256 noon = mintHour(SOLAR, root, leaves, whs, 12);
+        uint256 three = mintHour(SOLAR, root, leaves, whs, 15);
+        uint256[] memory ids = new uint256[](2);
+        uint256[] memory amts = new uint256[](2);
+        uint256[] memory prices = new uint256[](2);
+        (ids[0], ids[1]) = (noon, three);
+        (amts[0], amts[1]) = (100_000, 50_000);
+        (prices[0], prices[1]) = (1 gwei, 3 gwei);
+        vm.startPrank(solarCoop);
+        reg.setApprovalForAll(address(market), true);
+        uint256 first = market.listBatch(ids, amts, prices);
+        vm.stopPrank();
+        assertEq(market.listingCount(), 2);
+        uint256[] memory lids = new uint256[](2);
+        uint256[] memory buys = new uint256[](2);
+        (lids[0], lids[1]) = (first, first + 1);
+        (buys[0], buys[1]) = (40_000, 50_000);
+        uint256 cost = 40_000 * 1 gwei + 50_000 * 3 gwei;
+        vm.deal(hotel, 1 ether);
+        vm.prank(hotel);
+        vm.expectRevert(SaatMarket.WrongPayment.selector);
+        market.buyBatch{value: cost - 1}(lids, buys);
+        vm.prank(hotel);
+        market.buyBatch{value: cost}(lids, buys);
+        assertEq(reg.balanceOf(hotel, noon), 40_000);
+        assertEq(reg.balanceOf(hotel, three), 50_000);
+        assertEq(solarCoop.balance, cost);
+        (,, uint256 left,) = market.listings(first);
+        assertEq(left, 60_000);
+    }
+
     function test_OnlySellerCancels() public {
         (, uint256 listingId) = listNoon(300_000, 1 gwei);
         vm.prank(hotel);

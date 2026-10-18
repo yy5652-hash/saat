@@ -18,6 +18,22 @@ Companies say they run on "100% renewable" electricity because they bought certi
 
 ## The problem, measured on real data
 
+**On Türkiye's real 2025 grid, "100% renewable" covers 72% of electricity in the same hour.**
+The data is EPİAŞ real-time generation by source and demand for every hour of 2025, republished by the IEA Real-Time Electricity Tracker (CC BY 4.0). Annual totals by source match Ember within 0.5%. EPİAŞ's real-time feed covers licensed plants only, so solar is scaled to Ember's monthly national totals. A flat 24/7 consumer that buys wind and solar certificates equal to its annual use, as a slice of Türkiye's real fleet output, gets ([`analysis/turkiye_gap.py`](analysis/turkiye_gap.py) → [`results/turkiye_gap.json`](results/turkiye_gap.json)):
+
+| Türkiye, 2025 | hourly matched | reported as zero |
+|---|---|---|
+| Wind + solar certificates (100% of annual use) | **72.3%** | 128 kg CO₂e per MWh, on a 408 kg/MWh grid |
+| Wind only | 77.5% | |
+| Solar only | 43.5% | |
+
+Reaching 90% hour by hour would take 2.1× the annual volume.
+
+The same data also checks the Antalya models:
+- **Solar:** the modelled Antalya solar plant follows national solar hour by hour (r = 0.91).
+- **Wind:** the modelled Aegean wind share follows national wind with r = 0.67 hourly and r = 0.74 daily.
+- **Diversity:** if the hotel's certificates followed Türkiye's whole fleet instead of two plants, its contract alone would cover 76% instead of 63%. Diversity helps, and an hourly market across the zone is what makes it available.
+
 **Across 22 U.S. grid regions in 2025, "100% renewable" covers a median 65.5% of electricity in the same hour.**
 We took every U.S. balancing authority in EIA-930 with more than 20 TWh of demand and more than 3% wind and solar. A consumer with a flat 24/7 load (a data centre, say) buys wind and solar certificates equal to 100% of its annual use, as a pro-rata slice of its own region's real hourly fleet output. Under annual accounting it reports 100%. Hour by hour:
 
@@ -60,9 +76,9 @@ flowchart LR
 - `settleDay` proves all 24 hourly loads and retires each hour's certificates in **one transaction** under the same rules; one bad hour reverts the whole day. On the demo day it settles the hotel (24 proofs, 35 retirements) for 1.17M gas, 30% less than 24 separate transactions.
 - `claimSummary(meter, fromDay, toDay)` returns load, matched energy and the hourly score in basis points, computed on-chain.
 
-`SaatMarket`: a seller lists one hour's certificates at a price per Wh. The certificates sit in escrow until bought or cancelled, so a listed hour cannot be sold twice. It is guarded against reentrancy.
+`SaatMarket`: a seller lists hours at a price per Wh; `listBatch` lists a plant's whole surplus day in one transaction. The certificates sit in escrow until bought or cancelled, so a listed hour cannot be sold twice. `buyBatch` fills a consumer's whole forecast shortfall in one payment, and each seller is paid for their own lots. It is guarded against reentrancy. With batching and `settleDay`, the entire demo market day takes 27 transactions: two plants, two consumers, 35 listed lots and 32 purchases.
 
-There are 24 Foundry tests, including a fuzz test that matched energy never exceeds load, a test that a tampered amount fails its proof, and a test that a wrong hour inside `settleDay` reverts the whole day.
+There are 25 Foundry tests, including a fuzz test that matched energy never exceeds load, a test that a tampered amount fails its proof, and a test that a wrong hour inside `settleDay` reverts the whole day.
 
 ### AI issuance verifier ([`saat/verifier.py`](saat/verifier.py))
 
@@ -109,17 +125,18 @@ Türkiye hosts COP31 in Antalya in November 2026. The demo community sits in Tü
 
 Both consumers hold certificates equal to 100% of their annual use, split half solar and half wind. Generation is **modelled from real hourly ERA5 weather** at those coordinates (pvlib PVWatts; a generic 3.5 MW-class turbine curve). The two load profiles are **synthetic** (temperature-driven, following Antalya's tourist season). No real company is depicted.
 
-**All of 2025, hour by hour** ([`analysis/antalya_eval.py`](analysis/antalya_eval.py)):
+**All of 2025, hour by hour** ([`analysis/antalya_eval.py`](analysis/antalya_eval.py)). The hotel does every day what it does on the demo day: contract, then day-ahead shifting, then buying its forecast shortfall from the plants' uncontracted output, listed hour by hour.
 
-| | hourly matched |
+| The hotel, 2025 | hourly matched |
 |---|---|
 | Annual claim | 100% |
-| Each consumer alone | 64.4% |
-| + P2P trading of surplus hours between them | 66.3% |
-| + AI day-ahead load shifting (previous-day forecasts) | **69.7%** |
-| Same, with perfect foresight | 70.8% |
+| Hourly, contract only | 62.9% |
+| + AI day-ahead load shifting (previous-day forecasts) | 67.5% |
+| + hourly market (buys 18% more certificates, only in short hours) | **82.8%** |
 
-The planner recovers 76% of what perfect foresight would. The headroom left above 70% is why the hourly market matters: it lets the hotel buy night-time wind it would otherwise never see.
+- **Typical, not lucky:** the hotel's median day is 85% (P10 57%, P90 99.5%). Summer averages 85% and winter 76.5%. The same model gives 85.3% for 10 July 2025; the live demo shows 84.6%.
+- **Planner value:** for the hotel and campus together, without the market, shifting recovers 76% of what perfect foresight would (64.4% → 69.7%, against a 70.8% bound).
+- **Market access:** the community does not need the whole market. With 10%, 25%, 50% or all of the plants' spare output on offer, it reaches 74.1%, 77.6%, 80.6% and 83.2%.
 
 **The demo day (10 July 2025) on a live local chain:**
 - **Before trading:** the hotel's own contract covers **59.9%** of its load hour by hour.
@@ -133,16 +150,24 @@ Requirements: macOS or Linux, [uv](https://docs.astral.sh/uv/), [Foundry](https:
 ```bash
 git clone --recursive https://github.com/yy5652-hash/saat && cd saat
 uv sync
-(cd contracts && forge test)          # 24 contract tests
-uv run pytest                         # 19 Python tests, including a full flow on Anvil
+(cd contracts && forge test)          # 25 contract tests
+uv run pytest                         # 21 Python tests, including a full flow on Anvil
 uv run uvicorn app.server:app --port 8417
 ```
 
 Open http://localhost:8417 and press **Run the whole day**, or go step by step. The server starts its own Anvil chain, deploys the contracts and registers the community. The first start downloads the weather data and trains the models (about a minute); later starts take a second.
 
+To run the same day on a public testnet (Sepolia), with every transaction signed locally and the hotel's 84.6% readable from `claimSummary` on the explorer, see [`docs/TESTNET.md`](docs/TESTNET.md):
+
+```bash
+uv run python scripts/public_chain_day.py --local   # rehearsal on Anvil with the real keys
+uv run python scripts/public_chain_day.py           # Sepolia
+```
+
 Reproduce the studies (each downloads its public data once into `data/raw/`):
 
 ```bash
+uv run python analysis/turkiye_gap.py     # EPİAŞ via IEA, Türkiye, 2025
 uv run python analysis/hourly_gap.py      # EIA-930, 22 balancing authorities, 2025
 uv run python analysis/verifier_eval.py   # PVDAQ 9068 + ERA5, simulated fraud
 uv run python analysis/antalya_eval.py    # Antalya community, 2025
@@ -175,6 +200,8 @@ tests/          Python tests, including an end-to-end run on Anvil
 
 | Data | Source | Terms |
 |---|---|---|
+| Hourly Türkiye generation by source and demand, 2024–2025 | EPİAŞ Transparency Platform, via the IEA Real-Time Electricity Tracker | CC BY 4.0 |
+| Monthly national solar, Türkiye | Ember monthly electricity data | CC BY 4.0 |
 | Hourly U.S. grid generation and demand, 2025 | EIA-930 six-month files, U.S. Energy Information Administration | Public domain |
 | Measured PV output, system 9068 | NREL PVDAQ, DOE Open Energy Data Initiative | CC BY 4.0 |
 | Hourly reanalysis weather (ERA5) and previous-day forecasts | Open-Meteo archive and previous-runs APIs | CC BY 4.0, non-commercial API use |

@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 
 from saat.paths import RESULTS
-from saat.planner import SupplyForecaster, cfe, shift_load, solar_features, wind_features
+from saat.planner import SupplyForecaster, cfe, market_buy, plan_day_ahead, shift_load, solar_features, wind_features
 from saat.scenario import CAMPUS, HOTEL, SOLAR, WIND, Community, campus_kwh, contracted_supply, hotel_kwh, weather
 
 FLEX = {"hotel_kwh": 0.15, "campus_kwh": 0.10}  # laundry, pool pumps, hot water, EV shuttles / pre-cooling
@@ -50,9 +50,10 @@ def main():
     fc_year = pd.DataFrame({k: v[test] for k, v in forecasts.items()})
     lfc = load_fc[test]
     res = {"year": 2025, "hours": int(len(year)), "forecast_skill": skill, "consumers": {}}
-    supplies, supplies_fc = {}, {}
+    supplies, supplies_fc, shares = {}, {}, {}
     for col in ("hotel_kwh", "campus_kwh"):
         s, a, b = contracted_supply(year, col)
+        shares[col] = (a, b)
         supplies[col] = s
         supplies_fc[col] = a * fc_year.solar_kwh + b * fc_year.wind_kwh
         res["consumers"][col] = {
@@ -78,6 +79,38 @@ def main():
         "hourly_cfe_p2p_plus_perfect_shift": round(cfe(shifted_perfect, S), 4),
         "energy_shifted_share": round(float((shifted_ai - L).clip(lower=0).sum() / L.sum()), 4),
         "flexible_share_of_load": round(float(flex.sum() / L.sum()), 4),
+    }
+    # ---- hourly market: the plants' uncontracted output, listed hour by hour (what the demo day does)
+    sa = shares["hotel_kwh"][0] + shares["campus_kwh"][0]
+    wa = shares["hotel_kwh"][1] + shares["campus_kwh"][1]
+    uncontracted = (1 - sa) * year.solar_kwh + (1 - wa) * year.wind_kwh
+    market = {}
+    for alpha in (0.1, 0.25, 0.5, 1.0):
+        _, got = market_buy(planned, S_fc, alpha * uncontracted)
+        market[f"{alpha:g}"] = {
+            "hourly_cfe": round(cfe(shifted_ai, S + got), 4),
+            "bought_share_of_annual_load": round(float(got.sum() / L.sum()), 4),
+        }
+    res["community"]["with_hourly_market"] = market
+    res["community"]["market_note"] = "alpha = share of the two plants' uncontracted output this community can buy; the rest goes to other buyers"
+    # ---- the hotel alone, exactly as on the demo day: contract + AI shift + first call on the market
+    h_own, h_own_fc = supplies["hotel_kwh"], supplies_fc["hotel_kwh"]
+    h_plan = plan_day_ahead(lfc.hotel_kwh, h_own_fc, FLEX["hotel_kwh"])
+    h_load = year.hotel_kwh + (h_plan - lfc.hotel_kwh)
+    h_bid, h_got = market_buy(h_plan, h_own_fc, uncontracted)
+    days = (pd.DatetimeIndex(year.index) + pd.Timedelta(hours=3)).normalize()
+    m = pd.DataFrame({"L": h_load.values, "M": np.minimum(h_load, h_own + h_got).values}, index=days).groupby(level=0).sum()
+    daily = m.M / m.L
+    demo_day = pd.Timestamp("2025-07-10")
+    res["hotel"] = {
+        "hourly_cfe_contract_only": res["consumers"]["hotel_kwh"]["hourly_cfe_alone"],
+        "hourly_cfe_with_ai_shift": round(cfe(h_load, h_own), 4),
+        "hourly_cfe_with_ai_shift_and_market": round(cfe(h_load, h_own + h_got), 4),
+        "bought_share_of_annual_load": round(float(h_got.sum() / year.hotel_kwh.sum()), 4),
+        "daily_cfe_p10_p50_p90": [round(float(daily.quantile(q)), 3) for q in (0.1, 0.5, 0.9)],
+        "summer_jun_aug_cfe": round(float(m.M[(m.index.month >= 6) & (m.index.month <= 8)].sum() / m.L[(m.index.month >= 6) & (m.index.month <= 8)].sum()), 4),
+        "winter_dec_feb_cfe": round(float(m.M[(m.index.month == 12) | (m.index.month <= 2)].sum() / m.L[(m.index.month == 12) | (m.index.month <= 2)].sum()), 4),
+        "demo_day_2025_07_10_model": round(float(daily.get(demo_day, np.nan)), 4),
     }
     res["notes"] = {
         "supply": "modelled from ERA5 hourly weather at the plant coordinates (pvlib PVWatts; generic turbine curve)",

@@ -32,7 +32,40 @@
     "hourly_cfe_p2p_plus_ai_shift": 0.6967,
     "hourly_cfe_p2p_plus_perfect_shift": 0.7077,
     "energy_shifted_share": 0.045,
-    "flexible_share_of_load": 0.135
+    "flexible_share_of_load": 0.135,
+    "with_hourly_market": {
+      "0.1": {
+        "hourly_cfe": 0.7408,
+        "bought_share_of_annual_load": 0.056
+      },
+      "0.25": {
+        "hourly_cfe": 0.7758,
+        "bought_share_of_annual_load": 0.0977
+      },
+      "0.5": {
+        "hourly_cfe": 0.8063,
+        "bought_share_of_annual_load": 0.1332
+      },
+      "1": {
+        "hourly_cfe": 0.8323,
+        "bought_share_of_annual_load": 0.1618
+      }
+    },
+    "market_note": "alpha = share of the two plants' uncontracted output this community can buy; the rest goes to other buyers"
+  },
+  "hotel": {
+    "hourly_cfe_contract_only": 0.6285,
+    "hourly_cfe_with_ai_shift": 0.675,
+    "hourly_cfe_with_ai_shift_and_market": 0.8276,
+    "bought_share_of_annual_load": 0.1796,
+    "daily_cfe_p10_p50_p90": [
+      0.57,
+      0.85,
+      0.995
+    ],
+    "summer_jun_aug_cfe": 0.8498,
+    "winter_dec_feb_cfe": 0.7652,
+    "demo_day_2025_07_10_model": 0.8526
   },
   "notes": {
     "supply": "modelled from ERA5 hourly weather at the plant coordinates (pvlib PVWatts; generic turbine curve)",

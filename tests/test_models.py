@@ -51,3 +51,25 @@ def test_wind_power_curve_bounds():
     assert 0 < cf[2] < cf[3] < 0.9
     assert cf[4] == pytest.approx(0.9)  # rated, after 10% losses
     assert cf[5] == 0  # above cut-out
+
+
+def test_market_buy_bids_shortfall_and_caps_at_listing():
+    from saat.planner import market_buy
+
+    planned = _day([100.0] * 24)
+    own_fc = _day([0.0] * 6 + [150.0] * 12 + [0.0] * 6)
+    listed = _day([30.0] * 24)
+    bid, got = market_buy(planned, own_fc, listed)
+    assert bid.iloc[0] == 100.0 and bid.iloc[12] == 0.0  # no bid in a forecast-surplus hour
+    assert got.max() == 30.0  # never more than was actually listed
+    assert (got <= bid).all()
+
+
+def test_plan_day_ahead_keeps_daily_energy():
+    from saat.planner import plan_day_ahead
+
+    load_fc = _day([100.0] * 24)
+    own_fc = _day([0.0] * 9 + [250.0] * 6 + [0.0] * 9)
+    planned = plan_day_ahead(load_fc, own_fc, 0.15)
+    assert planned.sum() == pytest.approx(load_fc.sum())
+    assert planned.iloc[9:15].sum() > load_fc.iloc[9:15].sum()  # energy moved into the surplus window

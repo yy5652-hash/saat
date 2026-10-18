@@ -16,3 +16,4 @@ film/work/
 film/*-frames.jpg
 film/
 .claude/
+results/public_chain_day_local.json

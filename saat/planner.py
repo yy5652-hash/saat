@@ -81,9 +81,21 @@ def shift_load(load: pd.Series, supply: pd.Series, flex: pd.Series, window=(6, 2
     return pd.Series(out, index=load.index)
 
 
+def plan_day_ahead(load_fc: pd.Series, own_fc: pd.Series, flex_share: float) -> pd.Series:
+    """The planner's load schedule from forecasts only: flexible load moved into forecast surplus."""
+    return shift_load(load_fc, own_fc, flex_share * load_fc)
+
+
+def market_buy(planned_fc: pd.Series, own_fc: pd.Series, listed: pd.Series) -> tuple[pd.Series, pd.Series]:
+    """Bid each hour's forecast shortfall; delivery is capped by the certificates actually listed for
+    that hour (other plants' uncontracted output). Returns (bid, delivered), both in kWh."""
+    bid = (planned_fc - own_fc).clip(lower=0)
+    return bid, np.minimum(bid, listed.clip(lower=0))
+
+
 def cfe(load, supply) -> float:
     load, supply = np.asarray(load, float), np.asarray(supply, float)
     return float(np.minimum(load, supply).sum() / load.sum())
 
 
-__all__ = ["SupplyForecaster", "shift_load", "cfe", "solar_features", "wind_features", "wind_cf"]
+__all__ = ["SupplyForecaster", "shift_load", "plan_day_ahead", "market_buy", "cfe", "solar_features", "wind_features", "wind_cf"]

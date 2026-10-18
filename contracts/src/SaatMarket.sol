@@ -27,6 +27,7 @@ contract SaatMarket is ERC1155Holder, ReentrancyGuard {
     error NotEnough();
     error WrongPayment();
     error PayoutFailed();
+    error LengthMismatch();
 
     constructor(IERC1155 registry_) {
         registry = registry_;
@@ -37,6 +38,46 @@ contract SaatMarket is ERC1155Holder, ReentrancyGuard {
         listings.push(Listing(msg.sender, id, wh, priceWeiPerWh));
         registry.safeTransferFrom(msg.sender, address(this), id, wh, "");
         emit Listed(listingId, msg.sender, id, wh, priceWeiPerWh);
+    }
+
+    /// @notice List several hours at once (a plant's whole surplus day) in one escrow transfer.
+    function listBatch(uint256[] calldata ids, uint256[] calldata whs, uint256[] calldata pricesWeiPerWh)
+        external
+        returns (uint256 firstListingId)
+    {
+        uint256 n = ids.length;
+        if (whs.length != n || pricesWeiPerWh.length != n) revert LengthMismatch();
+        firstListingId = listings.length;
+        for (uint256 i = 0; i < n; i++) {
+            listings.push(Listing(msg.sender, ids[i], whs[i], pricesWeiPerWh[i]));
+            emit Listed(firstListingId + i, msg.sender, ids[i], whs[i], pricesWeiPerWh[i]);
+        }
+        registry.safeBatchTransferFrom(msg.sender, address(this), ids, whs, "");
+    }
+
+    /// @notice Buy from several listings at once (a consumer's forecast shortfall for a day). The
+    ///         payment must equal the total cost; each seller is paid for their own lots.
+    function buyBatch(uint256[] calldata listingIds, uint256[] calldata whs) external payable nonReentrant {
+        uint256 n = listingIds.length;
+        if (whs.length != n) revert LengthMismatch();
+        uint256[] memory ids = new uint256[](n);
+        uint256 total;
+        for (uint256 i = 0; i < n; i++) {
+            Listing storage l = listings[listingIds[i]];
+            if (whs[i] == 0 || whs[i] > l.remainingWh) revert NotEnough();
+            l.remainingWh -= whs[i];
+            ids[i] = l.id;
+            total += whs[i] * l.priceWeiPerWh;
+        }
+        if (msg.value != total) revert WrongPayment();
+        registry.safeBatchTransferFrom(address(this), msg.sender, ids, whs, "");
+        for (uint256 i = 0; i < n; i++) {
+            Listing storage l = listings[listingIds[i]];
+            uint256 pay = whs[i] * l.priceWeiPerWh;
+            (bool ok,) = l.seller.call{value: pay}("");
+            if (!ok) revert PayoutFailed();
+            emit Bought(listingIds[i], msg.sender, whs[i], pay);
+        }
     }
 
     function buy(uint256 listingId, uint256 wh) external payable nonReentrant {

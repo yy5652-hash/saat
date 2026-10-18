@@ -10,9 +10,11 @@ from dataclasses import dataclass, field
 
 import numpy as np
 import pandas as pd
+from eth_account import Account
 from eth_utils import keccak
+from web3 import Web3
 
-from saat.chain import LocalChain, Saat
+from saat.chain import LocalChain, Saat, Signer
 from saat.merkle import KIND_CONSUMPTION, KIND_GENERATION, DayTree
 from saat.paths import PROCESSED
 from saat.planner import SupplyForecaster, cfe, shift_load, solar_features, wind_features
@@ -103,22 +105,54 @@ def build_models() -> dict:
 # ------------------------------------------------------------------ the demo session
 
 
+class RemoteChain:
+    """A JSON-RPC endpoint we do not own (a public testnet): nothing to start or stop."""
+
+    def __init__(self, url: str):
+        self.url = url
+        self.w3 = Web3(Web3.HTTPProvider(url, request_kwargs={"timeout": 60}))
+
+    def close(self):
+        pass
+
+
 @dataclass
 class Demo:
+    """One market day. Locally it starts its own Anvil chain with seven role accounts. With `rpc_url`
+    and `keys` ({"operator", "hotel", "campus"} private keys) it runs on that network instead, every
+    transaction signed locally: the operator is registry, issuers and both plants."""
+
     day: str = DEMO_DAY
     log: list = field(default_factory=list)
+    rpc_url: str | None = None
+    keys: dict | None = None
+    consumer_gas_wei: int = 0  # top up hotel and campus to this balance (public networks)
+    base_price_wei_per_wh: int = BASE_PRICE
 
     def __post_init__(self):
         self.models = build_models()
-        self.chain = LocalChain()
-        w3 = self.chain.w3
-        a = w3.eth.accounts
-        self.who = {"registry": a[0], "issuer": a[1], "utility": a[2], "coop": a[3], "wind": a[4], "hotel": a[5], "campus": a[6]}
-        self.saat = Saat.deploy(w3, self.who["registry"])
-        self._tx("registry", "deploy SaatRegistry + SaatMarket", None)
+        if self.rpc_url:
+            self.chain = RemoteChain(self.rpc_url)
+            w3 = self.chain.w3
+            signer = Signer(w3, self.keys.values(), estimate_retries=4)
+            addr = {k: Account.from_key(v).address for k, v in self.keys.items()}
+            op = addr["operator"]
+            self.who = {"registry": op, "issuer": op, "utility": op, "coop": op, "wind": op, "hotel": addr["hotel"], "campus": addr["campus"]}
+            self.saat = Saat.deploy(w3, op, signer=signer)
+            for c in ("hotel", "campus"):
+                short = self.consumer_gas_wei - w3.eth.get_balance(addr[c])
+                if short > 0:
+                    self.saat.send_eth(op, addr[c], short)
+        else:
+            self.chain = LocalChain()
+            w3 = self.chain.w3
+            a = w3.eth.accounts
+            self.who = {"registry": a[0], "issuer": a[1], "utility": a[2], "coop": a[3], "wind": a[4], "hotel": a[5], "campus": a[6]}
+            self.saat = Saat.deploy(w3, self.who["registry"])
+        self._tx("registry", "deploy SaatRegistry + SaatMarket", self.saat.history[-1] if self.saat.history else None)
         s, r = self.saat, self.who["registry"]
-        s.set_issuer(r, self.who["issuer"])
-        s.set_issuer(r, self.who["utility"])
+        for issuer in dict.fromkeys([self.who["issuer"], self.who["utility"]]):
+            s.set_issuer(r, issuer)
         s.set_zone_offset(r, ZONE, UTC_OFFSET)
         for did, d in DEVICES.items():
             s.register_device(r, did, self.who[d["owner"]], ZONE, int(d["capacity_kw"] * 1000), d["tech"])
@@ -251,22 +285,22 @@ class Demo:
         listed = []
         for did, d in DEVICES.items():
             owner = self.who[d["owner"]]
-            for i, h in enumerate(self.hour_idx):
-                cid = self.saat.cert_id(did, h)
-                bal = self.saat.balance(owner, cid)
-                if bal <= 0:
-                    continue
-                price = int(BASE_PRICE * (1 + 3 * scarcity[i]))
-                lid, r = self.saat.list(owner, cid, bal, price)
-                self.listings[(did, h)] = lid
-                listed.append({"device": did, "hour": h, "label": f"{(self.hours[i] + pd.Timedelta(hours=UTC_OFFSET)).hour:02d}:00", "kwh": round(bal / 1000, 1), "price_eth_per_mwh": price * 1_000_000 / 1e18})
-        self._tx("coop+wind", f"list {len(listed)} hourly lots of surplus certificates on SaatMarket", None)
+            cids = [self.saat.cert_id(did, h) for h in self.hour_idx]
+            lots = [(i, cid, bal) for i, (cid, bal) in enumerate(zip(cids, self.saat.balances(owner, cids))) if bal > 0]
+            if not lots:
+                continue
+            prices = [int(self.base_price_wei_per_wh * (1 + 3 * scarcity[i])) for i, _, _ in lots]
+            first, r = self.saat.list_batch(owner, [c for _, c, _ in lots], [b for _, _, b in lots], prices)
+            self._tx(d["owner"], f"list {len(lots)} hourly {d['key']} lots on SaatMarket in one transaction", r)
+            for k, ((i, cid, bal), price) in enumerate(zip(lots, prices)):
+                self.listings[(did, self.hour_idx[i])] = first + k
+                listed.append({"device": did, "hour": self.hour_idx[i], "label": f"{(self.hours[i] + pd.Timedelta(hours=UTC_OFFSET)).hour:02d}:00", "kwh": round(bal / 1000, 1), "price_eth_per_mwh": price * 1_000_000 / 1e18})
         return listed
 
     def order_book(self) -> list[dict]:
         rows = []
         for (did, h), lid in self.listings.items():
-            seller, cid, remaining, price = self.saat.market.functions.listings(lid).call()
+            seller, cid, remaining, price = self.saat.read(self.saat.market.functions.listings(lid))
             i = self.hour_idx.index(h)
             rows.append({"listing": lid, "device": did, "label": f"{(self.hours[i] + pd.Timedelta(hours=UTC_OFFSET)).hour:02d}:00", "i": i, "kwh": round(remaining / 1000, 1), "price_eth_per_mwh": price * 1_000_000 / 1e18})
         return sorted(rows, key=lambda r: (r["i"], r["device"]))
@@ -303,14 +337,16 @@ class Demo:
     def execute(self, meter_id: int) -> dict:
         m = METERS[meter_id]
         plan = self.plans[m["key"]]
-        bought = 0
+        lids, whs = [], []
         for b in plan["buys"]:
-            remaining = self.saat.market.functions.listings(b["listing"]).call()[2]
+            remaining = self.saat.read(self.saat.market.functions.listings(b["listing"]))[2]
             wh = min(b["wh"], remaining)
             if wh > 0:
-                r = self.saat.buy(self.who[m["owner"]], b["listing"], wh)
-                bought += wh
-        self._tx(m["owner"], f"buy {len(plan['buys'])} hourly lots ({bought / 1000:.0f} kWh) on SaatMarket", None)
+                lids.append(b["listing"])
+                whs.append(wh)
+        bought = sum(whs)
+        r = self.saat.buy_batch(self.who[m["owner"]], lids, whs) if lids else None
+        self._tx(m["owner"], f"buy {len(lids)} hourly lots ({bought / 1000:.0f} kWh) on SaatMarket in one transaction", r)
         actual = self.models["actual"][m["col"]].loc[self.hours]
         delta = pd.Series(plan["shift_delta"], index=self.hours)
         self.final_load[meter_id] = [int(round(x * 1000)) for x in (actual + delta).clip(lower=0)]
@@ -355,7 +391,7 @@ class Demo:
         evening = self.hour_idx[21]
         cid = self.saat.cert_id(1, noon)
         try:
-            self.saat.registry.functions.retire(meter_id, evening, [cid], [1]).call({"from": owner})
+            self.saat.read(self.saat.registry.functions.retire(meter_id, evening, [cid], [1]), sender=owner)
             return {"reverted": False}
         except Exception as e:
             return {"reverted": True, "error": self.saat.explain_revert(e), "certificate": "12:00 solar", "load_hour": "21:00"}

@@ -139,7 +139,7 @@ def mismatch(req: MeterReq):
 @app.get("/api/evidence")
 def evidence():
     out = {}
-    for name in ("hourly_gap", "verifier_eval", "antalya_eval"):
+    for name in ("turkiye_gap", "hourly_gap", "verifier_eval", "antalya_eval"):
         p = RESULTS / f"{name}.json"
         if p.exists():
             out[name] = json.loads(p.read_text())
