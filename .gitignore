@@ -10,3 +10,7 @@ runtime/
 .env
 .DS_Store
 data/processed/*.pkl
+film/work/
+*.mp4
+*.srt
+film/*-frames.jpg

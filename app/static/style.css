@@ -7,8 +7,8 @@
   --line: #e4ded0;
   --teal: #0d4f5c;
   --teal-2: #13707f;
-  --solar: #f2a541;
-  --wind: #4c9be8;
+  --solar: #e0901a;
+  --wind: #3b86d6;
   --load: #15232b;
   --held: #d9483b;
   --ok: #2e9e6b;
@@ -93,8 +93,10 @@ button.busy::after { content: ""; position: absolute; inset: 0; margin: auto; wi
 .score.final { background: #eef5f1; border-color: #cfe6d9; }
 .score.final .v { color: var(--ok); }
 
-.evidence .ev-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 8px; }
-.ev { border: 1px solid var(--line); border-radius: 12px; padding: 16px; background: #fbfaf6; min-width: 0; }
+.evidence .ev-grid { display: grid; grid-template-columns: 1fr; gap: 16px; margin-top: 8px; }
+.ev { border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; background: #fbfaf6; min-width: 0; display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: 24px; align-items: center; }
+.ev .chart { margin-top: 0; }
+.tbl { font-size: 13.5px; }
 .tbl { width: 100%; border-collapse: collapse; font-size: 12.5px; }
 .tbl th, .tbl td { text-align: left; padding: 5px 6px; border-bottom: 1px solid var(--line); }
 .tbl td.n { text-align: right; font-variant-numeric: tabular-nums; }
@@ -109,7 +111,7 @@ button.busy::after { content: ""; position: absolute; inset: 0; margin: auto; wi
 #feed .tx { font-family: var(--mono); font-size: 11px; color: #8fb3b8; }
 #feed li.fresh { animation: flash 1.2s ease-out; }
 @keyframes flash { from { background: rgba(126,226,168,.25); } to { background: transparent; } }
-.run { width: 100%; margin-bottom: 8px; background: var(--solar); border-color: var(--solar); color: #2b1d05; }
+.run { width: 100%; margin-bottom: 8px; background: #f2a541; border-color: #f2a541; color: #2b1d05; }
 .feed .ghost { width: 100%; color: #8fb3b8; border-color: rgba(255,255,255,.15); }
 
 .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--held); color: #fff; padding: 12px 18px; border-radius: 10px; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,.2); z-index: 20; }
@@ -117,7 +119,7 @@ button.busy::after { content: ""; position: absolute; inset: 0; margin: auto; wi
 @media (max-width: 1100px) {
   .layout { grid-template-columns: 1fr; }
   .feed { position: static; max-height: none; }
-  .evidence .ev-grid { grid-template-columns: 1fr; }
+  .ev { grid-template-columns: 1fr; }
 }
 @media (max-width: 640px) {
   .top { flex-wrap: wrap; padding: 10px 16px; gap: 10px; }

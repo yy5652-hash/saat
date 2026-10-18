@@ -31,7 +31,7 @@ We took every U.S. balancing authority in EIA-930 with more than 20 TWh of deman
 
 To reach 90% hourly matching with the same portfolio, a buyer needs 1.4× to 7.3× its annual volume. In 7 of the 22 regions, 90% is out of reach at any volume up to 10×. Source: [`analysis/hourly_gap.py`](analysis/hourly_gap.py) → [`results/hourly_gap.json`](results/hourly_gap.json).
 
-Hourly accounting is where the rules are heading. The GHG Protocol's Scope 2 revision has proposed hourly matching, and hourly certificate registries already operate (EnergyTag-compliant issuance in PJM and ERCOT, among others). Hourly certificates mean 8,760 records per meter per year. That calls for cheap issuance, a way to trade individual hours, and claims anyone can check.
+Hourly accounting is where the rules are heading. The GHG Protocol's Scope 2 revision put hourly matching out for public consultation, and in the U.S. PJM, ERCOT and CleanCounts already issue hourly certificates (per EnergyTag). Hourly certificates mean 8,760 records per meter per year. That calls for cheap issuance, a way to trade individual hours, and claims anyone can check.
 
 ## How Saat works
 
@@ -156,7 +156,7 @@ uv run python analysis/antalya_eval.py    # Antalya community, 2025
 
 **Scale:**
 - **Issuance cost:** one transaction per plant per day; minting is lazy, so only certificates that are traded or retired ever touch the chain.
-- **Measured gas:** commit 99k per plant-day, mint ~40k per hour in a batch, retire ~66k per hour.
+- **Measured gas:** commit 99k per plant-day, mint 40–50k per hour in a batch, retire ~66k per hour.
 - **Where it can run:** the contracts are plain Solidity 0.8 and OpenZeppelin 5, deployable on any EVM chain, including low-fee rollups or a permissioned network run by a registry.
 
 ## Repository

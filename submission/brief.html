@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Saat: technical brief</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm; }
+  :root { --ink: #15232b; --ink2: #4a5a63; --teal: #0d4f5c; --amber: #e0901a; --line: #e4ded0; --red: #d9483b; --green: #2e9e6b; }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; color: var(--ink); font-size: 10.2pt; line-height: 1.45; margin: 0; }
+  h1 { font-size: 24pt; margin: 0; letter-spacing: -0.01em; }
+  h2 { font-size: 13.5pt; margin: 16pt 0 6pt; color: var(--teal); }
+  h3 { font-size: 11pt; margin: 10pt 0 4pt; }
+  p { margin: 0 0 6pt; }
+  .head { display: flex; align-items: center; gap: 12pt; border-bottom: 2px solid var(--teal); padding-bottom: 8pt; margin-bottom: 10pt; }
+  .head img { width: 42pt; height: 42pt; }
+  .sub { color: var(--ink2); font-size: 10.5pt; }
+  .meta { margin-left: auto; text-align: right; font-size: 8.6pt; color: var(--ink2); }
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6pt; margin: 8pt 0; }
+  .kpi { border: 1px solid var(--line); border-radius: 6pt; padding: 6pt 8pt; background: #fbfaf6; }
+  .kpi b { display: block; font-size: 16pt; color: var(--teal); }
+  .kpi span { font-size: 8.4pt; color: var(--ink2); }
+  table { width: 100%; border-collapse: collapse; font-size: 9pt; margin: 4pt 0 8pt; }
+  th, td { text-align: left; padding: 3pt 5pt; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+  img.shot { width: 60%; display: block; margin-left: auto; margin-right: auto; border: 1px solid var(--line); border-radius: 6pt; margin: 4pt 0 6pt; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 10pt; }
+  .note { font-size: 8.4pt; color: var(--ink2); }
+  .brk { break-before: page; }
+  .two, table, h3 { break-inside: avoid; } h2, h3 { break-after: avoid; }
+  ul { margin: 2pt 0 6pt 14pt; padding: 0; } li { margin-bottom: 2pt; }
+  code { font-family: ui-monospace, Menlo, monospace; font-size: 8.8pt; background: #f3efe4; padding: 0 2pt; border-radius: 2pt; }
+</style></head>
+<body>
+<div class="head">
+  <img src="../app/static/saat.svg" alt="">
+  <div><h1>Saat</h1><div class="sub">Hourly proof for clean energy: AI-verified hourly certificates, traded peer to peer, retired on-chain only against same-hour load</div></div>
+  <div class="meta">IEEE ClimateChain Global Hackathon 2026<br>Track: Renewable Energy &amp; Energy Trading<br>github.com/yy5652-hash/saat</div>
+</div>
+
+<h2>The problem</h2>
+<p>Companies call themselves "100% renewable" because they buy certificates equal to their <b>annual</b> electricity use. Electricity is consumed <b>hour by hour</b>, and a solar MWh from noon cannot have powered a hotel at 9 p.m. Using EIA-930 hourly data for 2025, we measured the gap for a 24/7 consumer that buys wind and solar certificates equal to 100% of its annual use from its own region's fleet:</p>
+<div class="kpis">
+  <div class="kpi"><b>65.5%</b><span>median load matched in the same hour, across 22 U.S. balancing authorities (range 41–82%)</span></div>
+  <div class="kpi"><b>124 kg</b><span>CO₂e per MWh consumed (median) drawn from the grid but reported as zero</span></div>
+  <div class="kpi"><b>43.7%</b><span>median hourly match for solar-only certificates</span></div>
+  <div class="kpi"><b>8,760</b><span>certificates per meter per year once accounting moves to hourly matching</span></div>
+</div>
+<p>Hourly accounting is where the rules are heading: the GHG Protocol's Scope 2 revision consulted on it, and U.S. registries (PJM, ERCOT, CleanCounts) already issue hourly certificates. Hourly certificates need cheap issuance, a market for individual hours, claims anyone can check, and protection against bad meter data, which a blockchain alone cannot provide.</p>
+
+<h2>What Saat does</h2>
+<table>
+  <tr><th style="width:24%">Step</th><th>Mechanism</th></tr>
+  <tr><td><b>1 · AI issuance verifier</b></td><td>Each metered hour is checked against ERA5 reanalysis weather, sun position and clear-sky irradiance by gradient-boosted median and 99th-percentile models trained on the plant's history. Rules: power after sunset; over capacity; above the weather envelope; day total or day <i>shape</i> (time shift) anomaly; 30-day drift. Held hours never enter the root. The report's SHA-256 is committed on-chain.</td></tr>
+  <tr><td><b>2 · Merkle issuance</b></td><td><code>commitGeneration</code>: one root per plant per local market day (~99k gas for 24 hours). Certificates are minted lazily as ERC-1155 tokens <code>id = plant ∥ hour</code>, 1 unit = 1 Wh, <b>once per plant-hour</b>, never above registered capacity.</td></tr>
+  <tr><td><b>3 · P2P market</b></td><td><code>SaatMarket</code>: escrowed listings of one hour's certificates, so a listed hour cannot also be sold elsewhere. Scarce hours carry higher prices. Reentrancy-guarded.</td></tr>
+  <tr><td><b>4 · AI day-ahead planner</b></td><td>Using only the previous day's forecast (Open-Meteo previous-runs archive), gradient boosting forecasts tomorrow's certificates hour by hour. Flexible load moves into forecast-surplus hours and the shortfall is bought from the cheapest listings.</td></tr>
+  <tr><td><b>5 · Hourly retirement</b></td><td>The utility commits the consumer's 24 readings, and the day's full load enters the denominator at once. <code>retire</code> burns only certificates of the <b>same hour and zone</b>, capped at that hour's load (a noon certificate against 21:00 reverts with <code>HourMismatch</code>). <code>claimSummary</code> returns the hourly score on-chain.</td></tr>
+</table>
+<img class="shot" src="../docs/claim.png" alt="Claim step">
+<p class="note">The demo day (10 July 2025) on a live local chain: the hotel's contract alone covers 59.9% of its load hour by hour. After P2P buying and the AI load shift, the on-chain hourly score is 84.6%.</p>
+
+<h2>Evidence on real data</h2>
+<h3>AI verifier: a real 4.7 MW plant, 16 months it never saw</h3>
+<p>NREL PVDAQ system 9068 (single-axis tracker, Kersey, Colorado; DOE Open Energy Data Initiative). The verifier was trained on 2017–2022, calibrated on 2023 and tested on Jan 2024–Apr 2025, with fraud simulated on the real test data. The table shows the share of fake energy that never becomes a certificate.</p>
+<table>
+  <tr><th>Fraud</th><th class="n">Capacity check (typical today)</th><th class="n">Physics bound only</th><th class="n">Saat AI</th></tr>
+  <tr><td>Power claimed after sunset</td><td class="n">0%</td><td class="n">100%</td><td class="n"><b>100%</b></td></tr>
+  <tr><td>Output relabelled 2 h later (into scarce evening hours)</td><td class="n">0%</td><td class="n">70%</td><td class="n"><b>81%</b></td></tr>
+  <tr><td>One hour inflated ×1.5</td><td class="n">0%</td><td class="n">24%</td><td class="n"><b>70%</b></td></tr>
+  <tr><td>Every hour +50%</td><td class="n">0%</td><td class="n">43%</td><td class="n"><b>63%</b></td></tr>
+  <tr><td>Sunny day replayed on a cloudy day</td><td class="n">0%</td><td class="n">14%</td><td class="n"><b>48%</b></td></tr>
+  <tr><td>Every hour +20%</td><td class="n">0%</td><td class="n">16%</td><td class="n">31%</td></tr>
+  <tr><td><b>Real energy wrongly held back</b></td><td class="n">0%</td><td class="n">7.1%</td><td class="n"><b>0.52%</b></td></tr>
+</table>
+<p>Hourly error is 10.4% of capacity, against 18.0% for physics alone (R² 0.75 vs 0.42). The 30-day drift test catches 94% of persistent +30% inflations within 90 days, with no false alarms across 424 clean days. The limit: small uniform inflation (≤10%) hides in weather uncertainty, so settlement-grade meters stay the first line of defence. The verifier covers what metering does not.</p>
+
+<h3>Antalya community, all of 2025</h3>
+<div class="two">
+  <div>
+    <p>The community is a 2 MW community solar plant (Antalya) and a 6 MW Aegean wind share (Karaburun), supplying a seaside hotel and an office campus in Türkiye's zone. Supply is modelled from real ERA5 weather; the loads are synthetic. The forecasters were trained on 2024 only.</p>
+    <p>The wind forecaster's error is 4.9% of capacity, against 7.0% for physics on the forecast and 11.2% for persistence.</p>
+  </div>
+  <table>
+    <tr><th>Hourly matched, 2025</th><th class="n">%</th></tr>
+    <tr><td>Annual claim</td><td class="n">100</td></tr>
+    <tr><td>Each consumer alone</td><td class="n">64.4</td></tr>
+    <tr><td>+ P2P hourly trading</td><td class="n">66.3</td></tr>
+    <tr><td>+ AI day-ahead shifting</td><td class="n"><b>69.7</b></td></tr>
+    <tr><td>Perfect foresight (bound)</td><td class="n">70.8</td></tr>
+  </table>
+</div>
+
+<h2>Adoption and scale</h2>
+<ul>
+  <li><b>Registries and grid operators.</b> In Türkiye, EPİAŞ already issues YEK-G guarantees of origin, one per MWh. Saat lets the issuer commit one root per plant-day from settlement data it already holds. It adds hourly granularity, local market days (UTC+3) and a public guard against double issuance and double claims.</li>
+  <li><b>Generators and energy communities</b> sell the hours that are worth most. Rooftop and cooperative solar without settlement-grade metering are where the AI verifier matters most.</li>
+  <li><b>Corporate buyers</b> (hotels, data centres, exporters facing carbon border rules) buy the hours they are short of, shift load, and publish a claim anyone can recompute from the chain.</li>
+  <li><b>Cost.</b> One transaction per plant per day. Minting is lazy, so only certificates that are traded or retired touch the chain. Measured gas: commit 99k per plant-day, mint 40–50k per hour in a batch, retire about 66k per hour. Plain Solidity 0.8 and OpenZeppelin 5 run on any EVM chain, a low-fee rollup or a registry-run permissioned network.</li>
+</ul>
+<h2>Engineering</h2>
+<ul>
+  <li><b>Contracts:</b> <code>SaatRegistry</code> and <code>SaatMarket</code>, with 22 Foundry tests. They include a fuzz test that matched energy never exceeds load, plus tests for tampered proofs, re-mint attempts, wrong day, wrong zone and wrong hour.</li>
+  <li><b>Python:</b> Merkle trees byte-compatible with Solidity, a web3.py client on Anvil, the verifier, the planner and the data loaders. 19 tests, including an end-to-end chain run.</li>
+  <li><b>Dashboard:</b> FastAPI plus Chart.js. It runs a full market day on a fresh chain with one click.</li>
+  <li><b>Reproducibility:</b> each study downloads its public data once and writes its results to <code>results/*.json</code>.</li>
+</ul>
+<h2>Data and honesty notes</h2>
+<table>
+  <tr><th>Data</th><th>Source</th></tr>
+  <tr><td>Hourly U.S. grid generation and demand, 2025</td><td>EIA-930 six-month files (U.S. EIA), public domain</td></tr>
+  <tr><td>Measured PV output, system 9068</td><td>NREL PVDAQ, DOE Open Energy Data Initiative</td></tr>
+  <tr><td>ERA5 hourly weather; previous-day forecasts</td><td>Open-Meteo archive and previous-runs APIs (CC BY 4.0)</td></tr>
+  <tr><td>Life-cycle emission factors</td><td>IPCC AR5 WG3 Annex III medians; oil/other per Electricity Maps defaults</td></tr>
+</table>
+<p class="note">The Antalya plants are modelled from real weather, and the hotel and campus loads are synthetic; no real company is depicted. The hidden-emissions estimate uses each region's own average hourly generation intensity and ignores imports. The verifier is evaluated on one real plant. The demo runs on a local test chain. Code is MIT-licensed.</p>
+</body></html>

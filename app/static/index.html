@@ -98,22 +98,28 @@
       <h2>What the numbers look like outside the demo</h2>
       <div class="ev-grid">
         <div class="ev">
-          <h3>The gap is real across U.S. grids</h3>
-          <p id="ev-gap-text"></p>
+          <div class="ev-text">
+            <h3>The gap is real across U.S. grids</h3>
+            <p id="ev-gap-text"></p>
+            <p class="note">EIA-930, hourly, 2025. A flat 24/7 consumer buys wind and solar certificates equal to 100% of its annual use from its own balancing authority's fleet.</p>
+          </div>
           <div class="chart tall"><canvas id="c-ev-gap"></canvas></div>
-          <p class="note">EIA-930, hourly, 2025. A flat 24/7 consumer buys wind and solar certificates equal to 100% of its annual use from its own balancing authority's fleet.</p>
         </div>
         <div class="ev">
-          <h3>The verifier stops fake certificates that a capacity check cannot see</h3>
-          <p id="ev-ver-text"></p>
+          <div class="ev-text">
+            <h3>The verifier stops fake certificates that a capacity check cannot see</h3>
+            <p id="ev-ver-text"></p>
+            <p class="note">PVDAQ system 9068, a 4.7 MW tracker plant in Colorado (NREL/DOE). Trained on 2017–2022, calibrated on 2023, tested on 2024–Apr 2025 with simulated fraud.</p>
+          </div>
           <table class="tbl" id="ev-ver"></table>
-          <p class="note">PVDAQ system 9068, a 4.7 MW tracker plant in Colorado (NREL/DOE). Trained on 2017–2022, calibrated on 2023, tested on 2024–Apr 2025 with simulated fraud.</p>
         </div>
         <div class="ev">
-          <h3>Antalya, all of 2025</h3>
-          <p id="ev-ant-text"></p>
+          <div class="ev-text">
+            <h3>Antalya, all of 2025</h3>
+            <p id="ev-ant-text"></p>
+            <p class="note">Plans use the forecasts archived the day before (Open-Meteo previous-day runs); the forecasters were trained on 2024 only.</p>
+          </div>
           <div class="chart"><canvas id="c-ev-ant"></canvas></div>
-          <p class="note">Plans use the forecasts archived the day before (Open-Meteo previous-day runs); the forecasters were trained on 2024 only.</p>
         </div>
       </div>
     </article>

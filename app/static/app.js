@@ -1,9 +1,12 @@
 "use strict";
 
+// Mark colours validated for lightness, chroma and colour-vision separation (dataviz validate_palette.js).
 const C = {
-  solar: "#f2a541", wind: "#4c9be8", load: "#15232b", held: "#d9483b", ok: "#2e9e6b",
-  teal: "#0d4f5c", grid: "#ece7da", ink3: "#7b8a92", buy: "#8e6bd8",
+  solar: "#e0901a", wind: "#3b86d6", load: "#15232b", held: "#d9483b", ok: "#2e9e6b",
+  data: "#00939f", teal: "#0d4f5c", grid: "#ece7da", ink3: "#7b8a92", buy: "#8e6bd8",
 };
+// Stacked and adjacent bars: capped thickness and a 2px surface-coloured gap between segments.
+const BAR = { maxBarThickness: 24, borderColor: "#ffffff", borderWidth: { top: 1, bottom: 1 } };
 const pct = (x, d = 1) => (x * 100).toFixed(d) + "%";
 const kwh = (x) => Math.round(x).toLocaleString("en-US") + " kWh";
 const short = (h) => (h ? h.slice(0, 10) + "…" + h.slice(-6) : "");
@@ -81,9 +84,9 @@ function drawGap() {
       labels: s.labels,
       datasets: [
         { type: "line", label: "Hotel load", stack: "l1", data: s.hotel_kwh, borderColor: C.load, borderWidth: 2.5, pointRadius: 0, tension: .3, order: 0 },
-        { type: "bar", label: "Solar certificates", data: s.hotel_contract_solar_kwh, backgroundColor: C.solar, stack: "s", order: 1 },
-        { type: "bar", label: "Wind certificates", data: s.hotel_contract_wind_kwh, backgroundColor: C.wind, stack: "s", order: 1 },
-        { type: "bar", label: "Not covered this hour", data: short_, backgroundColor: "rgba(217,72,59,.75)", stack: "s", order: 1 },
+        { type: "bar", label: "Solar certificates", data: s.hotel_contract_solar_kwh, backgroundColor: C.solar, stack: "s", order: 1, ...BAR },
+        { type: "bar", label: "Wind certificates", data: s.hotel_contract_wind_kwh, backgroundColor: C.wind, stack: "s", order: 1, ...BAR },
+        { type: "bar", label: "Not covered this hour", data: short_, backgroundColor: C.held, stack: "s", order: 1, ...BAR },
       ],
     },
     options: { scales: { x: axis("", { stacked: true, grid: { display: false } }), y: axis("kWh per hour", { stacked: true, beginAtZero: true }) } },
@@ -100,7 +103,7 @@ function drawIssue(v, committed) {
       datasets: [
         { type: "line", label: "Upper envelope (99th pct.)", data: v.hours.map((h) => h.upper_kwh), borderColor: C.ink3, borderDash: [5, 4], borderWidth: 1.5, pointRadius: 0, fill: false },
         { type: "line", label: "Expected from weather", data: v.hours.map((h) => h.expected_kwh), borderColor: C.teal, borderWidth: 2, pointRadius: 0, tension: .3 },
-        { type: "bar", label: "Meter claim", data: v.hours.map((h) => h.claimed_kwh), backgroundColor: v.hours.map((h) => (h.held ? C.held : C.ok)) },
+        { type: "bar", label: "Meter claim", data: v.hours.map((h) => h.claimed_kwh), backgroundColor: v.hours.map((h) => (h.held ? C.held : C.ok)), ...BAR },
       ],
     },
     options: { plugins: { tooltip: { callbacks: { afterLabel: (ctx) => (ctx.dataset.type === "bar" && v.hours[ctx.dataIndex].held ? "held: " + v.hours[ctx.dataIndex].reason : "") } } },
@@ -146,7 +149,7 @@ function drawBook(rows) {
       const r = rows.find((x) => x.device === dev && x.i === i && x.kwh > 0);
       if (!r) { html += `<div class="cell empty">.</div>`; continue; }
       const t = (r.price_eth_per_mwh - min) / (max - min || 1);
-      const base = dev === 1 ? [242, 165, 65] : [76, 155, 232];
+      const base = dev === 1 ? [224, 144, 26] : [59, 134, 214];
       const col = `rgba(${base.join(",")},${0.35 + 0.65 * t})`;
       html += `<div class="cell" style="background:${col}" title="${r.label} · ${r.kwh} kWh · ${r.price_eth_per_mwh.toFixed(4)} ETH/MWh">${Math.round(r.kwh)}</div>`;
     }
@@ -166,8 +169,8 @@ function drawPlan(p) {
       datasets: [
         { type: "line", label: "Load forecast", stack: "l1", data: p.load_fc, borderColor: C.ink3, borderDash: [5, 4], borderWidth: 1.8, pointRadius: 0, tension: .3 },
         { type: "line", label: "Planned load (after shifting)", stack: "l2", data: p.shifted_fc, borderColor: C.load, borderWidth: 2.5, pointRadius: 0, tension: .3 },
-        { type: "bar", label: "Own certificates (forecast)", data: p.own_fc, backgroundColor: "rgba(13,79,92,.55)", stack: "s" },
-        { type: "bar", label: "Buy on SaatMarket", data: buys, backgroundColor: C.buy, stack: "s" },
+        { type: "bar", label: "Own certificates (forecast)", data: p.own_fc, backgroundColor: C.data, stack: "s", ...BAR },
+        { type: "bar", label: "Buy on SaatMarket", data: buys, backgroundColor: C.buy, stack: "s", ...BAR },
       ],
     },
     options: { scales: { x: axis("", { stacked: true, grid: { display: false } }), y: axis("kWh", { stacked: true, beginAtZero: true }) } },
@@ -200,8 +203,8 @@ function drawClaim(meter, r) {
     data: {
       labels: r.hours.map((h) => h.label),
       datasets: [
-        { type: "bar", label: "Matched in the same hour", data: r.hours.map((h) => h.matched_kwh), backgroundColor: C.ok, stack: "s" },
-        { type: "bar", label: "Unmatched (grid mix)", data: r.hours.map((h) => Math.max(h.load_kwh - h.matched_kwh, 0)), backgroundColor: "rgba(217,72,59,.7)", stack: "s" },
+        { type: "bar", label: "Matched in the same hour", data: r.hours.map((h) => h.matched_kwh), backgroundColor: C.ok, stack: "s", ...BAR },
+        { type: "bar", label: "Unmatched (grid mix)", data: r.hours.map((h) => Math.max(h.load_kwh - h.matched_kwh, 0)), backgroundColor: C.held, stack: "s", ...BAR },
       ],
     },
     options: { scales: { x: axis("", { stacked: true, grid: { display: false } }), y: axis("kWh", { stacked: true, beginAtZero: true }) } },
@@ -240,7 +243,7 @@ async function drawEvidence() {
     const rows = g.by_ba.slice().sort((a, b) => b.hourly_cfe - a.hourly_cfe);
     chart("c-ev-gap", {
       type: "bar",
-      data: { labels: rows.map((r) => r.ba), datasets: [{ label: "hourly match", data: rows.map((r) => r.hourly_cfe * 100), backgroundColor: rows.map((r) => (r.hourly_cfe < 0.5 ? C.held : C.teal)) }] },
+      data: { labels: rows.map((r) => r.ba), datasets: [{ label: "hourly match", data: rows.map((r) => r.hourly_cfe * 100), backgroundColor: rows.map((r) => (r.hourly_cfe < 0.5 ? C.held : C.data)), maxBarThickness: 12 }] },
       options: { indexAxis: "y", plugins: { legend: { display: false } }, scales: { x: axis("% of load matched hour by hour", { min: 0, max: 100 }), y: { grid: { display: false }, ticks: { autoSkip: false, font: { size: 9.5 } } } } },
     });
   }
@@ -260,7 +263,7 @@ async function drawEvidence() {
     const vals = [1, c.hourly_cfe_separate, c.hourly_cfe_p2p_pooled, c.hourly_cfe_p2p_plus_ai_shift, c.hourly_cfe_p2p_plus_perfect_shift].map((x) => x * 100);
     chart("c-ev-ant", {
       type: "bar",
-      data: { labels, datasets: [{ data: vals, backgroundColor: [C.ok, C.held, C.teal, C.buy, "#b9c3c7"] }] },
+      data: { labels, datasets: [{ data: vals, backgroundColor: [C.data, C.data, C.data, C.buy, C.data], maxBarThickness: 22 }] },
       options: { indexAxis: "y", plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => ctx.raw.toFixed(1) + "%" } } }, scales: { x: axis("% of load", { min: 50, max: 100 }), y: { grid: { display: false } } } },
     });
   }
