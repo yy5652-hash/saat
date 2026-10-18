@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+data/raw/
+runtime/
+.env
+.DS_Store

@@ -1,0 +1,192 @@
+{
+  "data": "EIA-930 BALANCE 2025 (adjusted), hourly, UTC",
+  "consumer": "flat 24/7 load buying 100% of annual volume from its balancing authority's wind+solar fleet",
+  "balancing_authorities": 22,
+  "median_hourly_cfe": 0.655,
+  "range_hourly_cfe": [
+    0.412,
+    0.819
+  ],
+  "median_hidden_kg_per_mwh": 124.0,
+  "median_surplus_share": 0.345,
+  "by_ba": [
+    {
+      "ba": "PJM",
+      "demand_twh": 842.7,
+      "hourly_cfe": 0.7403,
+      "hidden_kg_per_mwh": 97.4367,
+      "surplus_share": 0.2597,
+      "volume_for_90pct": 2.1932187992674113
+    },
+    {
+      "ba": "MISO",
+      "demand_twh": 663.4,
+      "hourly_cfe": 0.814,
+      "hidden_kg_per_mwh": 87.8596,
+      "surplus_share": 0.186,
+      "volume_for_90pct": 1.4170195833666988
+    },
+    {
+      "ba": "SWPP",
+      "demand_twh": 299.3,
+      "hourly_cfe": 0.8122,
+      "hidden_kg_per_mwh": 91.0107,
+      "surplus_share": 0.1878,
+      "volume_for_90pct": 1.4239793243444776
+    },
+    {
+      "ba": "SOCO",
+      "demand_twh": 241.2,
+      "hourly_cfe": 0.4264,
+      "hidden_kg_per_mwh": 233.5912,
+      "surplus_share": 0.5736,
+      "volume_for_90pct": NaN
+    },
+    {
+      "ba": "CISO",
+      "demand_twh": 223.7,
+      "hourly_cfe": 0.6179,
+      "hidden_kg_per_mwh": 119.9401,
+      "surplus_share": 0.3821,
+      "volume_for_90pct": 3.826027526332174
+    },
+    {
+      "ba": "NYIS",
+      "demand_twh": 151.5,
+      "hourly_cfe": 0.6874,
+      "hidden_kg_per_mwh": 93.0097,
+      "surplus_share": 0.3126,
+      "volume_for_90pct": 3.0992040311542457
+    },
+    {
+      "ba": "FPL",
+      "demand_twh": 146.5,
+      "hourly_cfe": 0.4373,
+      "hidden_kg_per_mwh": 210.4239,
+      "surplus_share": 0.5627,
+      "volume_for_90pct": NaN
+    },
+    {
+      "ba": "ISNE",
+      "demand_twh": 115.2,
+      "hourly_cfe": 0.7718,
+      "hidden_kg_per_mwh": 77.6104,
+      "surplus_share": 0.2282,
+      "volume_for_90pct": 1.770576347002688
+    },
+    {
+      "ba": "CPLE",
+      "demand_twh": 63.2,
+      "hourly_cfe": 0.4116,
+      "hidden_kg_per_mwh": 178.1808,
+      "surplus_share": 0.5884,
+      "volume_for_90pct": NaN
+    },
+    {
+      "ba": "BPAT",
+      "demand_twh": 61.0,
+      "hourly_cfe": 0.5813,
+      "hidden_kg_per_mwh": 30.3055,
+      "surplus_share": 0.4187,
+      "volume_for_90pct": 7.273960629506915
+    },
+    {
+      "ba": "FPC",
+      "demand_twh": 58.1,
+      "hourly_cfe": 0.4353,
+      "hidden_kg_per_mwh": 290.8706,
+      "surplus_share": 0.5647,
+      "volume_for_90pct": NaN
+    },
+    {
+      "ba": "PACE",
+      "demand_twh": 53.6,
+      "hourly_cfe": 0.7655,
+      "hidden_kg_per_mwh": 143.0494,
+      "surplus_share": 0.2345,
+      "volume_for_90pct": 2.033328012946791
+    },
+    {
+      "ba": "PSCO",
+      "demand_twh": 45.3,
+      "hourly_cfe": 0.8189,
+      "hidden_kg_per_mwh": 83.6881,
+      "surplus_share": 0.1811,
+      "volume_for_90pct": 1.4012023994236422
+    },
+    {
+      "ba": "NEVP",
+      "demand_twh": 40.3,
+      "hourly_cfe": 0.468,
+      "hidden_kg_per_mwh": 282.498,
+      "surplus_share": 0.532,
+      "volume_for_90pct": NaN
+    },
+    {
+      "ba": "AZPS",
+      "demand_twh": 38.8,
+      "hourly_cfe": 0.6224,
+      "hidden_kg_per_mwh": 210.7042,
+      "surplus_share": 0.3776,
+      "volume_for_90pct": 3.5339112270705897
+    },
+    {
+      "ba": "SRP",
+      "demand_twh": 36.4,
+      "hourly_cfe": 0.6566,
+      "hidden_kg_per_mwh": 86.7827,
+      "surplus_share": 0.3434,
+      "volume_for_90pct": 6.854061448981108
+    },
+    {
+      "ba": "WACM",
+      "demand_twh": 34.3,
+      "hourly_cfe": 0.8051,
+      "hidden_kg_per_mwh": 113.8027,
+      "surplus_share": 0.1949,
+      "volume_for_90pct": 1.5731302902421795
+    },
+    {
+      "ba": "PSEI",
+      "demand_twh": 24.8,
+      "hourly_cfe": 0.6454,
+      "hidden_kg_per_mwh": 128.7257,
+      "surplus_share": 0.3546,
+      "volume_for_90pct": 5.54839628424701
+    },
+    {
+      "ba": "LDWP",
+      "demand_twh": 24.7,
+      "hourly_cfe": 0.6527,
+      "hidden_kg_per_mwh": 168.1892,
+      "surplus_share": 0.3473,
+      "volume_for_90pct": 3.37923126038425
+    },
+    {
+      "ba": "TEC",
+      "demand_twh": 22.4,
+      "hourly_cfe": 0.4316,
+      "hidden_kg_per_mwh": 279.4486,
+      "surplus_share": 0.5684,
+      "volume_for_90pct": NaN
+    },
+    {
+      "ba": "AECI",
+      "demand_twh": 22.3,
+      "hourly_cfe": 0.6868,
+      "hidden_kg_per_mwh": 208.8651,
+      "surplus_share": 0.3132,
+      "volume_for_90pct": 4.741567679648826
+    },
+    {
+      "ba": "PACW",
+      "demand_twh": 20.2,
+      "hourly_cfe": 0.6615,
+      "hidden_kg_per_mwh": 62.4744,
+      "surplus_share": 0.3385,
+      "volume_for_90pct": NaN
+    }
+  ],
+  "solar_only_flat_median_cfe": 0.437,
+  "wind_only_flat_median_cfe": 0.719
+}

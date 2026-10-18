@@ -1,0 +1,275 @@
+{
+  "accuracy": {
+    "test_hours": 11430,
+    "ml_mae_pct_of_ac": 10.43,
+    "physics_mae_pct_of_ac": 17.98,
+    "ml_r2": 0.753,
+    "physics_r2": 0.418,
+    "upper_coverage": 0.9756,
+    "tau": 0.0344,
+    "rho": 0.3183
+  },
+  "clean": {
+    "nameplate check": {
+      "clean_energy_held": 0.0,
+      "clean_daylight_hours_held": 0.0,
+      "clean_days_with_any_hold": 0.0
+    },
+    "physics bound": {
+      "clean_energy_held": 0.0709,
+      "clean_daylight_hours_held": 0.1008,
+      "clean_days_with_any_hold": 0.7598
+    },
+    "Saat AI (hourly rules)": {
+      "clean_energy_held": 0.0019,
+      "clean_daylight_hours_held": 0.0005,
+      "clean_days_with_any_hold": 0.1636
+    },
+    "Saat AI": {
+      "clean_energy_held": 0.0052,
+      "clean_daylight_hours_held": 0.0046,
+      "clean_days_with_any_hold": 0.1698
+    }
+  },
+  "attacks": {
+    "inflate_5": {
+      "nameplate check": {
+        "attacked_days": 478,
+        "days_caught": 0.0,
+        "fake_energy_blocked": 0.0
+      },
+      "physics bound": {
+        "attacked_days": 478,
+        "days_caught": 0.7762,
+        "fake_energy_blocked": 0.08
+      },
+      "Saat AI (hourly rules)": {
+        "attacked_days": 478,
+        "days_caught": 0.2573,
+        "fake_energy_blocked": 0.0465
+      },
+      "Saat AI": {
+        "attacked_days": 478,
+        "days_caught": 0.2636,
+        "fake_energy_blocked": 0.0499
+      }
+    },
+    "inflate_10": {
+      "nameplate check": {
+        "attacked_days": 481,
+        "days_caught": 0.0,
+        "fake_energy_blocked": 0.0
+      },
+      "physics bound": {
+        "attacked_days": 481,
+        "days_caught": 0.7775,
+        "fake_energy_blocked": 0.0916
+      },
+      "Saat AI (hourly rules)": {
+        "attacked_days": 481,
+        "days_caught": 0.3597,
+        "fake_energy_blocked": 0.0899
+      },
+      "Saat AI": {
+        "attacked_days": 481,
+        "days_caught": 0.3659,
+        "fake_energy_blocked": 0.0954
+      }
+    },
+    "inflate_20": {
+      "nameplate check": {
+        "attacked_days": 482,
+        "days_caught": 0.0,
+        "fake_energy_blocked": 0.0
+      },
+      "physics bound": {
+        "attacked_days": 482,
+        "days_caught": 0.8154,
+        "fake_energy_blocked": 0.1627
+      },
+      "Saat AI (hourly rules)": {
+        "attacked_days": 482,
+        "days_caught": 0.61,
+        "fake_energy_blocked": 0.2894
+      },
+      "Saat AI": {
+        "attacked_days": 482,
+        "days_caught": 0.6162,
+        "fake_energy_blocked": 0.3073
+      }
+    },
+    "inflate_50": {
+      "nameplate check": {
+        "attacked_days": 482,
+        "days_caught": 0.0,
+        "fake_energy_blocked": 0.0
+      },
+      "physics bound": {
+        "attacked_days": 482,
+        "days_caught": 0.8859,
+        "fake_energy_blocked": 0.4293
+      },
+      "Saat AI (hourly rules)": {
+        "attacked_days": 482,
+        "days_caught": 0.8382,
+        "fake_energy_blocked": 0.5714
+      },
+      "Saat AI": {
+        "attacked_days": 482,
+        "days_caught": 0.8382,
+        "fake_energy_blocked": 0.6332
+      }
+    },
+    "shift_1": {
+      "nameplate check": {
+        "attacked_days": 481,
+        "days_caught": 0.0,
+        "fake_energy_blocked": 0.0
+      },
+      "physics bound": {
+        "attacked_days": 481,
+        "days_caught": 0.9397,
+        "fake_energy_blocked": 0.5771
+      },
+      "Saat AI (hourly rules)": {
+        "attacked_days": 481,
+        "days_caught": 0.7692,
+        "fake_energy_blocked": 0.3117
+      },
+      "Saat AI": {
+        "attacked_days": 481,
+        "days_caught": 0.7859,
+        "fake_energy_blocked": 0.3594
+      }
+    },
+    "shift_2": {
+      "nameplate check": {
+        "attacked_days": 481,
+        "days_caught": 0.0,
+        "fake_energy_blocked": 0.0
+      },
+      "physics bound": {
+        "attacked_days": 481,
+        "days_caught": 0.9896,
+        "fake_energy_blocked": 0.7004
+      },
+      "Saat AI (hourly rules)": {
+        "attacked_days": 481,
+        "days_caught": 0.9709,
+        "fake_energy_blocked": 0.5763
+      },
+      "Saat AI": {
+        "attacked_days": 481,
+        "days_caught": 0.9854,
+        "fake_energy_blocked": 0.8058
+      }
+    },
+    "replay": {
+      "nameplate check": {
+        "attacked_days": 364,
+        "days_caught": 0.0,
+        "fake_energy_blocked": 0.0
+      },
+      "physics bound": {
+        "attacked_days": 364,
+        "days_caught": 0.9313,
+        "fake_energy_blocked": 0.1358
+      },
+      "Saat AI (hourly rules)": {
+        "attacked_days": 364,
+        "days_caught": 0.4533,
+        "fake_energy_blocked": 0.1924
+      },
+      "Saat AI": {
+        "attacked_days": 364,
+        "days_caught": 0.533,
+        "fake_energy_blocked": 0.4849
+      }
+    },
+    "after_sunset": {
+      "nameplate check": {
+        "attacked_days": 479,
+        "days_caught": 0.0,
+        "fake_energy_blocked": 0.0
+      },
+      "physics bound": {
+        "attacked_days": 479,
+        "days_caught": 1.0,
+        "fake_energy_blocked": 1.0
+      },
+      "Saat AI (hourly rules)": {
+        "attacked_days": 479,
+        "days_caught": 1.0,
+        "fake_energy_blocked": 1.0
+      },
+      "Saat AI": {
+        "attacked_days": 479,
+        "days_caught": 1.0,
+        "fake_energy_blocked": 1.0
+      }
+    },
+    "spike": {
+      "nameplate check": {
+        "attacked_days": 481,
+        "days_caught": 0.0,
+        "fake_energy_blocked": 0.0
+      },
+      "physics bound": {
+        "attacked_days": 481,
+        "days_caught": 0.8004,
+        "fake_energy_blocked": 0.2406
+      },
+      "Saat AI (hourly rules)": {
+        "attacked_days": 481,
+        "days_caught": 0.6736,
+        "fake_energy_blocked": 0.7046
+      },
+      "Saat AI": {
+        "attacked_days": 481,
+        "days_caught": 0.6736,
+        "fake_energy_blocked": 0.7046
+      }
+    }
+  },
+  "drift": {
+    "window_days": 30,
+    "statistic": "rolling median of daily claimed/expected energy",
+    "limit": 1.145,
+    "clean_max": 1.0192,
+    "clean_alarm_days": 0,
+    "clean_days_checked": 424,
+    "persistent_inflation": {
+      "5%": {
+        "trials": 52,
+        "caught_within_30d": 0.0,
+        "caught_within_90d": 0.0,
+        "median_days_to_catch": null
+      },
+      "10%": {
+        "trials": 52,
+        "caught_within_30d": 0.0,
+        "caught_within_90d": 0.0,
+        "median_days_to_catch": null
+      },
+      "20%": {
+        "trials": 52,
+        "caught_within_30d": 0.115,
+        "caught_within_90d": 0.442,
+        "median_days_to_catch": 99.0
+      },
+      "30%": {
+        "trials": 52,
+        "caught_within_30d": 0.462,
+        "caught_within_90d": 0.942,
+        "median_days_to_catch": 31.5
+      }
+    }
+  },
+  "data": {
+    "plant": "PVDAQ system 9068 (SR_CO), 4,738 kWdc / 3,820 kWac single-axis tracker, Kersey CO",
+    "weather": "ERA5 via Open-Meteo archive API, hourly",
+    "train": "2017-08 .. 2022-12",
+    "calibrate": "2023",
+    "test": "2024-01 .. 2025-04"
+  }
+}

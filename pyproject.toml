@@ -1,0 +1,32 @@
+[project]
+name = "climatechain-saat"
+version = "0.1.0"
+description = "Saat: hourly clean-energy certificates with AI-verified issuance"
+requires-python = ">=3.12"
+dependencies = [
+    "eth-abi>=6.0.0",
+    "eth-utils>=6.0.0",
+    "fastapi>=0.146.0",
+    "matplotlib>=3.11.2",
+    "numpy>=2.5.4",
+    "pandas>=3.0.6",
+    "pvlib>=0.16.1",
+    "pyarrow>=26.0.0",
+    "pycryptodome>=3.24.1",
+    "pytest>=9.1.1",
+    "requests>=2.34.2",
+    "scikit-learn>=1.9.1",
+    "uvicorn[standard]>=0.54.0",
+    "web3>=8.0.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["saat"]
