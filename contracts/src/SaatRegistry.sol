@@ -55,8 +55,11 @@ contract SaatRegistry is ERC1155, Ownable {
     mapping(uint32 => mapping(uint32 => uint64)) public dayLoadWh;
     mapping(uint32 => mapping(uint32 => uint64)) public dayMatchedWh;
     mapping(uint32 => mapping(uint64 => HourSlot)) public slots;
+    /// @dev Market days follow the zone's local standard time (Türkiye: UTC+3).
+    mapping(bytes32 => int8) public zoneUtcOffset;
 
     event IssuerSet(address indexed issuer, bool allowed);
+    event ZoneOffsetSet(bytes32 indexed zone, int8 hours_);
     event DeviceRegistered(uint32 indexed deviceId, address indexed owner, bytes32 zone, uint64 capacityW, uint8 technology);
     event MeterRegistered(uint32 indexed meterId, address indexed owner, bytes32 zone);
     event BatchCommitted(
@@ -88,6 +91,11 @@ contract SaatRegistry is ERC1155, Ownable {
     function setIssuer(address issuer, bool allowed) external onlyOwner {
         isIssuer[issuer] = allowed;
         emit IssuerSet(issuer, allowed);
+    }
+
+    function setZoneOffset(bytes32 zone, int8 hours_) external onlyOwner {
+        zoneUtcOffset[zone] = hours_;
+        emit ZoneOffsetSet(zone, hours_);
     }
 
     function registerDevice(uint32 deviceId, address owner_, bytes32 zone, uint64 capacityW, uint8 technology)
@@ -140,8 +148,8 @@ contract SaatRegistry is ERC1155, Ownable {
     {
         Batch storage b = batches[root];
         if (b.kind != KIND_GENERATION || b.subject != deviceId) revert BadBatch();
-        if (hour / 24 != b.day) revert WrongDay();
         Device storage d = devices[deviceId];
+        if (dayOf(d.zone, hour) != b.day) revert WrongDay();
         if (wh > d.capacityW) revert OverCapacity();
         if (!MerkleProof.verifyCalldata(proof, root, leafHash(KIND_GENERATION, deviceId, hour, wh))) revert BadProof();
         id = certificateId(deviceId, hour);
@@ -167,7 +175,7 @@ contract SaatRegistry is ERC1155, Ownable {
     // ---------------------------------------------------------------- claims
 
     function proveLoad(uint32 meterId, uint64 hour, uint64 wh, bytes32[] calldata proof) public {
-        bytes32 root = consumptionRoot[meterId][uint32(hour / 24)];
+        bytes32 root = consumptionRoot[meterId][dayOf(meters[meterId].zone, hour)];
         if (root == bytes32(0)) revert BadBatch();
         if (!MerkleProof.verifyCalldata(proof, root, leafHash(KIND_CONSUMPTION, meterId, hour, wh))) revert BadProof();
         HourSlot storage s = slots[meterId][hour];
@@ -196,7 +204,7 @@ contract SaatRegistry is ERC1155, Ownable {
         }
         if (s.matchedWh + total > s.loadWh) revert ExceedsLoad();
         s.matchedWh += uint64(total);
-        dayMatchedWh[meterId][uint32(hour / 24)] += uint64(total);
+        dayMatchedWh[meterId][dayOf(m.zone, hour)] += uint64(total);
         _burnBatch(msg.sender, ids, amounts);
     }
 
@@ -226,6 +234,11 @@ contract SaatRegistry is ERC1155, Ownable {
     }
 
     // ---------------------------------------------------------------- encoding
+
+    /// @notice Local market day of a UTC hour index in `zone`.
+    function dayOf(bytes32 zone, uint64 hour) public view returns (uint32) {
+        return uint32(uint64(int64(hour) + zoneUtcOffset[zone]) / 24);
+    }
 
     function leafHash(uint8 kind, uint32 subject, uint64 hour, uint64 wh) public pure returns (bytes32) {
         return keccak256(bytes.concat(keccak256(abi.encode(kind, subject, hour, wh))));

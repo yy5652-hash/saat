@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saat · hourly proof for clean energy</title>
+  <link rel="icon" href="/static/saat.svg">
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/vendor/chart.umd.min.js"></script>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <img src="/static/saat.svg" alt="" class="logo">
+    <div>
+      <div class="name">Saat</div>
+      <div class="tag">Hourly proof for clean energy</div>
+    </div>
+  </div>
+  <div class="where" id="where">Antalya · zone TR · market day —</div>
+  <div class="chain" id="chain"><span class="dot"></span><span id="chain-text">connecting…</span></div>
+</header>
+
+<main class="layout">
+  <section class="steps">
+
+    <article class="step hero" id="s-gap">
+      <div class="kicker">The problem</div>
+      <h1>"100% renewable" is an annual sum. Electricity is used by the hour.</h1>
+      <p class="lead">A seaside hotel in Antalya holds certificates equal to its yearly use, half from a community solar plant and half from an Aegean wind farm. Over the year, the numbers balance. This is one day of it.</p>
+      <div class="claims">
+        <div class="claim paper"><div class="v">100%</div><div class="l">claimed with annual certificates</div></div>
+        <div class="claim real"><div class="v" id="gap-cfe">—</div><div class="l">of the hotel's electricity on <span id="gap-day">this day</span> was actually matched in the same hour</div></div>
+      </div>
+      <div class="chart tall"><canvas id="c-gap"></canvas></div>
+      <p class="note">Bars: the hotel's contracted certificates by hour (solar, wind). Line: the hotel's load. Red: hours its certificates do not cover. Supply is modelled from ERA5 weather at the real sites; the hotel's load is synthetic.</p>
+    </article>
+
+    <article class="step" id="s-issue">
+      <div class="num">1</div>
+      <div class="kicker">Issue</div>
+      <h2>Every hour is checked before it can become a certificate</h2>
+      <p>The meter export for each hour is checked against independent weather (ERA5) and the position of the sun by gradient-boosted quantile models trained on the plant's own history. Wind is checked against a turbine power curve driven by hub-height reanalysis wind. Hours outside the envelope are held. The rest go into one Merkle root per plant-day: one transaction for 24 hours.</p>
+      <div class="controls">
+        <label>Plant <select id="issue-device"><option value="1">Antalya community solar</option><option value="2">Aegean wind share</option></select></label>
+        <label>Meter export <select id="issue-tamper"></select></label>
+        <button id="btn-verify" class="secondary">Run AI verifier</button>
+        <button id="btn-issue">Commit root &amp; mint</button>
+      </div>
+      <div class="chart"><canvas id="c-issue"></canvas></div>
+      <div class="facts" id="issue-facts"></div>
+    </article>
+
+    <article class="step" id="s-market">
+      <div class="num">2</div>
+      <div class="kicker">Deliver &amp; trade</div>
+      <h2>Contracted shares are delivered; every surplus hour goes on the market</h2>
+      <p>Each certificate is an ERC-1155 token tied to one plant and one hour. The plants deliver each consumer's contracted share, then list what is left, hour by hour. Evening and night hours are scarce, so they are priced higher.</p>
+      <div class="controls">
+        <button id="btn-deliver">Deliver contracted shares</button>
+        <button id="btn-list" class="secondary">List surplus on SaatMarket</button>
+      </div>
+      <div class="facts" id="deliver-facts"></div>
+      <div class="book" id="book"></div>
+    </article>
+
+    <article class="step" id="s-plan">
+      <div class="num">3</div>
+      <div class="kicker">AI day-ahead plan</div>
+      <h2>Buy the hours you will be short, and move flexible load to the hours in surplus</h2>
+      <p>The planner sees only what was known the day before: the weather forecast issued the previous day. Gradient boosting turns that forecast into tomorrow's certificates hour by hour. Laundry, pool pumps, water heating and shuttle charging (15% of the hotel's load) move into forecast surplus hours, and the planner buys the remaining shortfall from the cheapest listings.</p>
+      <div class="controls">
+        <label>Consumer <select id="plan-meter"><option value="7">Seaside hotel</option><option value="8">Office campus</option></select></label>
+        <button id="btn-plan" class="secondary">Plan from yesterday's forecast</button>
+        <button id="btn-execute">Execute the buys on-chain</button>
+      </div>
+      <div class="chart"><canvas id="c-plan"></canvas></div>
+      <div class="facts" id="plan-facts"></div>
+    </article>
+
+    <article class="step" id="s-claim">
+      <div class="num">4</div>
+      <div class="kicker">Claim</div>
+      <h2>Certificates are retired against metered load in the same hour, or not at all</h2>
+      <p>The utility commits the consumer's 24 hourly readings as a Merkle root. The consumer proves each hour's load and burns certificates from that hour and zone. The contract caps every hour at its load and computes the hourly score on-chain, where anyone can check it.</p>
+      <div class="controls">
+        <label>Consumer <select id="claim-meter"><option value="7">Seaside hotel</option><option value="8">Office campus</option></select></label>
+        <button id="btn-settle">Settle the day</button>
+        <button id="btn-mismatch" class="danger">Try: cover 21:00 with a noon certificate</button>
+      </div>
+      <div class="scores" id="scores"></div>
+      <div class="chart"><canvas id="c-claim"></canvas></div>
+      <div class="facts" id="claim-facts"></div>
+    </article>
+
+    <article class="step evidence" id="s-evidence">
+      <div class="kicker">Evidence on real data</div>
+      <h2>What the numbers look like outside the demo</h2>
+      <div class="ev-grid">
+        <div class="ev">
+          <h3>The gap is real across U.S. grids</h3>
+          <p id="ev-gap-text"></p>
+          <div class="chart tall"><canvas id="c-ev-gap"></canvas></div>
+          <p class="note">EIA-930, hourly, 2025. A flat 24/7 consumer buys wind and solar certificates equal to 100% of its annual use from its own balancing authority's fleet.</p>
+        </div>
+        <div class="ev">
+          <h3>The verifier stops fake certificates that a capacity check cannot see</h3>
+          <p id="ev-ver-text"></p>
+          <table class="tbl" id="ev-ver"></table>
+          <p class="note">PVDAQ system 9068, a 4.7 MW tracker plant in Colorado (NREL/DOE). Trained on 2017–2022, calibrated on 2023, tested on 2024–Apr 2025 with simulated fraud.</p>
+        </div>
+        <div class="ev">
+          <h3>Antalya, all of 2025</h3>
+          <p id="ev-ant-text"></p>
+          <div class="chart"><canvas id="c-ev-ant"></canvas></div>
+          <p class="note">Plans use the forecasts archived the day before (Open-Meteo previous-day runs); the forecasters were trained on 2024 only.</p>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <aside class="feed">
+    <div class="feed-head">On-chain activity</div>
+    <div class="addr" id="addr"></div>
+    <ol id="feed"></ol>
+    <button id="btn-run" class="run">Run the whole day</button>
+    <button id="btn-reset" class="ghost">Reset chain</button>
+  </aside>
+</main>
+<script src="/static/app.js"></script>
+</body>
+</html>

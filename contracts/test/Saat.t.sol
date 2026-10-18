@@ -200,6 +200,21 @@ contract SaatTest is Test {
         reg.mint(DISTANT, hourOf(DAY, 12), whs[12], root, p);
     }
 
+    function test_LocalMarketDay() public {
+        vm.prank(admin);
+        reg.setZoneOffset(ANTALYA, 3);
+        // 21:00 UTC on DAY-1 is 00:00 on DAY in Antalya, so it belongs to DAY's root.
+        uint64 hour = hourOf(DAY, 0) - 3;
+        bytes32 leaf = reg.leafHash(1, SOLAR, hour, 1_000);
+        vm.prank(issuer);
+        reg.commitGeneration(SOLAR, DAY, leaf, keccak256("r"), 1_000, 0);
+        assertEq(reg.dayOf(ANTALYA, hour), DAY);
+        uint256 id = reg.mint(SOLAR, hour, 1_000, leaf, new bytes32[](0));
+        assertEq(reg.balanceOf(solarCoop, id), 1_000);
+        vm.expectRevert(SaatRegistry.WrongDay.selector);
+        reg.mint(SOLAR, hourOf(DAY, 22), 1_000, leaf, new bytes32[](0));
+    }
+
     // ------------------------------------------------------------ claims
 
     function buyHourFromCoop(uint64 h, uint256 wh) internal returns (uint256 id) {

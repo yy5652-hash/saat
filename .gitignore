@@ -9,3 +9,4 @@ data/raw/
 runtime/
 .env
 .DS_Store
+data/processed/*.pkl

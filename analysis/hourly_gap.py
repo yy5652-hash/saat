@@ -72,7 +72,10 @@ def main():
         "range_hourly_cfe": [round(float(core.hourly_cfe.min()), 3), round(float(core.hourly_cfe.max()), 3)],
         "median_hidden_kg_per_mwh": round(float(core.hidden_kg_per_mwh.median()), 0),
         "median_surplus_share": round(float(core.surplus_share.median()), 3),
-        "by_ba": core[["ba", "demand_twh", "hourly_cfe", "hidden_kg_per_mwh", "surplus_share", "volume_for_90pct"]].to_dict("records"),
+        "by_ba": [
+            {k: (None if isinstance(v, float) and np.isnan(v) else v) for k, v in r.items()}
+            for r in core[["ba", "demand_twh", "hourly_cfe", "hidden_kg_per_mwh", "surplus_share", "volume_for_90pct"]].to_dict("records")
+        ],
         "solar_only_flat_median_cfe": round(float(table[(table.load == "flat 24/7") & (table.portfolio == "solar")].hourly_cfe.median()), 3),
         "wind_only_flat_median_cfe": round(float(table[(table.load == "flat 24/7") & (table.portfolio == "wind")].hourly_cfe.median()), 3),
     }

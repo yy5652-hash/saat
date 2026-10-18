@@ -8,6 +8,7 @@ import subprocess
 import time
 from dataclasses import dataclass
 
+from eth_utils import keccak
 from web3 import Web3
 
 from saat.merkle import DayTree
@@ -105,6 +106,9 @@ class Saat:
     def set_issuer(self, admin: str, issuer: str) -> Receipt:
         return self._send(self.registry.functions.setIssuer(issuer, True), admin)
 
+    def set_zone_offset(self, admin: str, zone_code: str, hours: int) -> Receipt:
+        return self._send(self.registry.functions.setZoneOffset(zone(zone_code), hours), admin)
+
     def register_device(self, admin, device_id, owner, zone_code, capacity_w, technology=1) -> Receipt:
         fn = self.registry.functions.registerDevice(device_id, owner, zone(zone_code), capacity_w, technology)
         return self._send(fn, admin)
@@ -133,6 +137,9 @@ class Saat:
         )
         return self._send(fn, payer)
 
+    def batch_transfer(self, sender, to, ids, amounts) -> Receipt:
+        return self._send(self.registry.functions.safeBatchTransferFrom(sender, to, ids, amounts, b""), sender)
+
     # ---------------------------------------------------------- market
 
     def list(self, seller, cert_id, wh, price_wei_per_wh) -> tuple[int, Receipt]:
@@ -155,6 +162,19 @@ class Saat:
     def claim_summary(self, meter_id, from_day, to_day) -> dict:
         load, matched, bps = self.registry.functions.claimSummary(meter_id, from_day, to_day).call()
         return {"load_wh": load, "matched_wh": matched, "cfe": bps / 10_000}
+
+    def explain_revert(self, exc: Exception) -> str:
+        """Name of the contract's custom error behind a failed call, e.g. 'HourMismatch'."""
+        data = getattr(exc, "data", None) or str(exc)
+        if isinstance(data, dict):
+            data = data.get("data", "")
+        for abi in (self.registry.abi, self.market.abi):
+            for item in abi:
+                if item.get("type") == "error":
+                    sig = f"{item['name']}({','.join(i['type'] for i in item.get('inputs', []))})"
+                    if keccak(text=sig)[:4].hex() in str(data):
+                        return item["name"]
+        return str(exc)
 
     def cert_id(self, device_id, hour) -> int:
         return (device_id << 64) | hour

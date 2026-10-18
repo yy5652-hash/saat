@@ -40,7 +40,7 @@
       "hourly_cfe": 0.4264,
       "hidden_kg_per_mwh": 233.5912,
       "surplus_share": 0.5736,
-      "volume_for_90pct": NaN
+      "volume_for_90pct": null
     },
     {
       "ba": "CISO",
@@ -64,7 +64,7 @@
       "hourly_cfe": 0.4373,
       "hidden_kg_per_mwh": 210.4239,
       "surplus_share": 0.5627,
-      "volume_for_90pct": NaN
+      "volume_for_90pct": null
     },
     {
       "ba": "ISNE",
@@ -80,7 +80,7 @@
       "hourly_cfe": 0.4116,
       "hidden_kg_per_mwh": 178.1808,
       "surplus_share": 0.5884,
-      "volume_for_90pct": NaN
+      "volume_for_90pct": null
     },
     {
       "ba": "BPAT",
@@ -96,7 +96,7 @@
       "hourly_cfe": 0.4353,
       "hidden_kg_per_mwh": 290.8706,
       "surplus_share": 0.5647,
-      "volume_for_90pct": NaN
+      "volume_for_90pct": null
     },
     {
       "ba": "PACE",
@@ -120,7 +120,7 @@
       "hourly_cfe": 0.468,
       "hidden_kg_per_mwh": 282.498,
       "surplus_share": 0.532,
-      "volume_for_90pct": NaN
+      "volume_for_90pct": null
     },
     {
       "ba": "AZPS",
@@ -168,7 +168,7 @@
       "hourly_cfe": 0.4316,
       "hidden_kg_per_mwh": 279.4486,
       "surplus_share": 0.5684,
-      "volume_for_90pct": NaN
+      "volume_for_90pct": null
     },
     {
       "ba": "AECI",
@@ -184,7 +184,7 @@
       "hourly_cfe": 0.6615,
       "hidden_kg_per_mwh": 62.4744,
       "surplus_share": 0.3385,
-      "volume_for_90pct": NaN
+      "volume_for_90pct": null
     }
   ],
   "solar_only_flat_median_cfe": 0.437,
