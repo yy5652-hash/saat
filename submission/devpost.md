@@ -13,7 +13,7 @@
 
 **Links:**
 - Code: https://github.com/yy5652-hash/saat (TODO: make public)
-- Demo video: TODO (YouTube, 3:57)
+- Demo video: TODO (YouTube, 4:22)
 - Prototype: runs locally with `uv run uvicorn app.server:app` (instructions in the README)
 
 ---

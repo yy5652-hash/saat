@@ -34,7 +34,7 @@ METERS = {
 BASE_PRICE = 10**9  # wei per Wh = 0.001 test-ETH per MWh
 TAMPERS = {
     "none": "honest meter export",
-    "shift": "output relabelled two hours later, into scarce evening hours",
+    "shift": "output relabelled two hours later, claiming sunshine into the evening",
     "inflate": "every hour inflated by 40%",
     "night": "250 kWh claimed after sunset",
 }
