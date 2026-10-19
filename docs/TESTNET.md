@@ -8,6 +8,20 @@
 
 The hotel's on-chain score is 84.6%, the same as in the film.
 
+## The live run (19 October 2026)
+
+| | |
+|---|---|
+| SaatRegistry | [`0x616F40B710dD84ad0d3a7a347EF2ff252AEB2F4A`](https://sepolia.etherscan.io/address/0x616F40B710dD84ad0d3a7a347EF2ff252AEB2F4A) |
+| SaatMarket | [`0xF2aDeEBA6DE1B5d68Eb9181658B6C666F285AA0D`](https://sepolia.etherscan.io/address/0xF2aDeEBA6DE1B5d68Eb9181658B6C666F285AA0D) |
+| Source | verified on Sourcify, exact match ([registry](https://repo.sourcify.dev/11155111/0x616F40B710dD84ad0d3a7a347EF2ff252AEB2F4A), [market](https://repo.sourcify.dev/11155111/0xF2aDeEBA6DE1B5d68Eb9181658B6C666F285AA0D)) |
+| Transactions | 27, 79,200,947 gas on Sepolia's current gas schedule |
+| Hotel | `claimSummary(7, 20279, 20279)` → 8460 bps (84.6%), settled in [one `settleDay`](https://sepolia.etherscan.io/tx/0x9f94476a99f1df8b7a39841b233596566a94b1dc7c8f5d3756ff9eea6f1a6bca) |
+| Campus | 82.8%, settled in [one `settleDay`](https://sepolia.etherscan.io/tx/0xf09180c33fbecfffc5936379f2047422d33ee70d4fe6c2c8e801066ca8309ab5) |
+| Hour rule | a 12:00 certificate against 21:00 load reverts with `HourMismatch` |
+
+Every transaction hash, with its explorer link, gas and fee, is in [`results/public_chain_day.json`](../results/public_chain_day.json).
+
 ## Wallets
 
 There are three keys in `.env` at the project root. The file is git-ignored and readable only by its owner, and the keys are never printed:

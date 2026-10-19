@@ -14,6 +14,7 @@
 **Links:**
 - Code: https://github.com/yy5652-hash/saat (TODO: make public)
 - Demo video: TODO (YouTube, 4:22)
+- Live on Ethereum Sepolia: SaatRegistry https://sepolia.etherscan.io/address/0x616F40B710dD84ad0d3a7a347EF2ff252AEB2F4A (source verified on Sourcify)
 - Prototype: runs locally with `uv run uvicorn app.server:app` (instructions in the README)
 
 ---
@@ -52,13 +53,13 @@ Türkiye hosts COP31 in Antalya this November. Antalya's hotels, like data centr
   - plus buying its forecast shortfall on the hourly market: **82.8%**, buying 18% more certificates, only in the hours it is short.
 
   Its median day is 85%, so the demo day is typical, not lucky. The wind forecaster's error is 4.9% of capacity, against 11.2% for persistence. Even with access to only a quarter of the plants' spare output, the community reaches 77.6%.
-- **Demo day (10 July 2025) on a live chain.** The hotel's contract alone covers 59.9% of its load hour by hour. After trading and planning, the on-chain score is **84.6%**.
+- **Demo day (10 July 2025), live on Ethereum Sepolia.** The hotel's contract alone covers 59.9% of its load hour by hour. After trading and planning, the score computed on-chain is **84.6%**: 27 transactions, contracts source-verified on Sourcify, and `claimSummary` returns 8460 basis points for anyone to check.
 
 ### Who uses it, and how it scales
 - **Registries and grid operators:** in Türkiye, EPİAŞ already issues YEK-G guarantees of origin, one per MWh. Saat lets them commit one root per plant-day from the settlement data they already hold. It adds hourly granularity and a public guard against double issuance and double claims.
 - **Generators and energy cooperatives:** sell the hours that are worth most. Rooftop and community solar without settlement-grade meters are where the AI verifier matters most.
 - **Corporate buyers** (hotels, data centres, exporters facing carbon border rules): buy the hours they are short of, shift load, and publish a claim anyone can recompute from the chain.
-- **Scale:** one transaction per plant per day, lazy minting, and plain Solidity/OpenZeppelin deployable on any EVM chain, including low-fee rollups or a registry-run permissioned network. Measured gas: commit 99k per plant-day; a consumer's whole day settles in one transaction (1.17M gas for 24 hours and 35 retirements, 30% less than hour by hour).
+- **Scale:** one transaction per plant per day, lazy minting, and plain Solidity/OpenZeppelin deployable on any EVM chain, including low-fee rollups or a registry-run permissioned network. Measured gas on Anvil: commit 99k per plant-day; a consumer's whole day settles in one transaction (1.17M gas for 24 hours and 35 retirements, 30% less than hour by hour).
 
 ### How we built it
 - **Contracts:** Solidity 0.8.28 with OpenZeppelin 5.4 (ERC-1155, MerkleProof, ReentrancyGuard), tested with Foundry. 25 tests, including a fuzz test that matched energy never exceeds load.
@@ -85,10 +86,10 @@ Türkiye hosts COP31 in Antalya this November. Antalya's hotels, like data centr
 - Run a pilot with a registry's settlement data, such as YEK-G's hourly metering.
 - Add peer comparison across neighbouring plants, alongside the 30-day drift test.
 - Support storage-shifted certificates and cross-zone deliverability rules.
-- Move from the public testnet to a low-fee rollup or a registry-run network.
+- Move from Sepolia to a low-fee rollup or a registry-run network.
 
 ### Data notes
 - The Antalya plants are modelled from real weather, and the hotel and campus loads are synthetic. No real company is depicted.
 - The real-data claims come from the EPİAŞ, EIA-930 and PVDAQ studies.
-- The dashboard runs the day on a local chain; `scripts/public_chain_day.py` runs the same day on a public testnet.
+- The dashboard runs the day on a local chain; `scripts/public_chain_day.py` ran the same day on Ethereum Sepolia (all transaction links in `results/public_chain_day.json`).
 - The video narration uses a synthetic voice (Chatterbox, MIT licence). Footage is Pexels-licensed stock and NASA imagery, credited in the video.

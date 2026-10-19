@@ -10,6 +10,8 @@ Companies say they run on "100% renewable" electricity because they bought certi
 - an **AI day-ahead planner** buys the hours a consumer will be short of and moves flexible load into surplus hours;
 - **hourly retirement** burns a certificate only against the consumer's metered load in the same hour and the same grid zone, and computes the hourly carbon-free score on-chain.
 
+**Live on Ethereum Sepolia:** [SaatRegistry](https://sepolia.etherscan.io/address/0x616F40B710dD84ad0d3a7a347EF2ff252AEB2F4A) and [SaatMarket](https://sepolia.etherscan.io/address/0xF2aDeEBA6DE1B5d68Eb9181658B6C666F285AA0D), source verified on [Sourcify](https://repo.sourcify.dev/11155111/0x616F40B710dD84ad0d3a7a347EF2ff252AEB2F4A). The demo day ran there in 27 transactions; `claimSummary(7, 20279, 20279)` returns the hotel's 84.6% (8460 basis points).
+
 **Track:** Renewable Energy & Energy Trading (renewable certificate tracking, P2P trading, tokenized incentives). It also serves Carbon Markets & Emissions Transparency (smart contracts that prevent double counting).
 
 ![Saat dashboard](docs/dashboard.png)
@@ -138,10 +140,26 @@ Both consumers hold certificates equal to 100% of their annual use, split half s
 - **Planner value:** for the hotel and campus together, without the market, shifting recovers 76% of what perfect foresight would (64.4% → 69.7%, against a 70.8% bound).
 - **Market access:** the community does not need the whole market. With 10%, 25%, 50% or all of the plants' spare output on offer, it reaches 74.1%, 77.6%, 80.6% and 83.2%.
 
-**The demo day (10 July 2025) on a live local chain:**
+**The demo day (10 July 2025), on a local chain and on Ethereum Sepolia:**
 - **Before trading:** the hotel's own contract covers **59.9%** of its load hour by hour.
 - **After trading:** after the plants deliver contracted shares and list their surplus, the planner moves 600 kWh into the midday surplus and buys evening wind certificates. The on-chain score is **84.6%**.
 - **Tampering:** a meter export shifted by two hours has the whole day held back. Power claimed after sunset is held in the exact two hours.
+
+### Live on Ethereum Sepolia
+
+The same day, run by [`scripts/public_chain_day.py`](scripts/public_chain_day.py) with every transaction signed locally ([`results/public_chain_day.json`](results/public_chain_day.json) lists all 27):
+
+| Step | Transaction |
+|---|---|
+| Contracts | [SaatRegistry](https://sepolia.etherscan.io/address/0x616F40B710dD84ad0d3a7a347EF2ff252AEB2F4A) · [SaatMarket](https://sepolia.etherscan.io/address/0xF2aDeEBA6DE1B5d68Eb9181658B6C666F285AA0D) · [Sourcify: exact match](https://repo.sourcify.dev/11155111/0x616F40B710dD84ad0d3a7a347EF2ff252AEB2F4A) |
+| Solar plant-day committed as one Merkle root | [`commitGeneration`](https://sepolia.etherscan.io/tx/0xec45d4b9bb342e7ea480bb83e5bd1c147acef1e2e5a7069a315ac74158b9369c) |
+| Surplus day listed in one transaction | [`listBatch`](https://sepolia.etherscan.io/tx/0x61022509cb3acd654d9045985a41511cf27315b9a8e24e0d268e0b77e92153c2) |
+| The hotel buys its short hours | [`buyBatch`](https://sepolia.etherscan.io/tx/0x99c6c0471fa00195c7d84225679af0459c0ee1f8e2991e2e97dbf7452b8f91e2) |
+| The hotel's whole day settled | [`settleDay`](https://sepolia.etherscan.io/tx/0x9f94476a99f1df8b7a39841b233596566a94b1dc7c8f5d3756ff9eea6f1a6bca) |
+| Score, read from the chain | `claimSummary(7, 20279, 20279)` → 6,196,400 Wh load, 5,242,618 Wh matched, **8460** bps |
+| Noon certificate against 21:00 load | reverts with `HourMismatch` |
+
+The hotel scores 84.6% and the campus 82.8%, exactly as on the local chain.
 
 ## Run it
 
@@ -182,7 +200,7 @@ uv run python analysis/antalya_eval.py    # Antalya community, 2025
 
 **Scale:**
 - **Issuance cost:** one transaction per plant per day; minting is lazy, so only certificates that are traded or retired ever touch the chain.
-- **Measured gas:** commit 99k per plant-day, mint 40–50k per hour in a batch, settle a consumer's whole day in one transaction (1.17M gas for 24 hours and 35 retirements, about 49k per hour).
+- **Measured gas (local Anvil):** commit 99k per plant-day, mint 40–50k per hour in a batch, settle a consumer's whole day in one transaction (1.17M gas for 24 hours and 35 retirements, about 49k per hour). On Sepolia's current gas schedule the whole demo day is 79.2M gas in 27 transactions.
 - **Where it can run:** the contracts are plain Solidity 0.8 and OpenZeppelin 5, deployable on any EVM chain, including low-fee rollups or a permissioned network run by a registry.
 
 ## Repository
@@ -207,7 +225,7 @@ tests/          Python tests, including an end-to-end run on Anvil
 | Hourly reanalysis weather (ERA5) and previous-day forecasts | Open-Meteo archive and previous-runs APIs | CC BY 4.0, non-commercial API use |
 | Life-cycle emission factors | IPCC AR5 WG3 Annex III medians; oil/other per Electricity Maps defaults | cited |
 
-Fonts: Inter, Space Grotesk and JetBrains Mono (SIL Open Font License), vendored in `app/static/fonts`. Code: MIT. The demo runs on a local test chain; "ETH" amounts are test values.
+Fonts: Inter, Space Grotesk and JetBrains Mono (SIL Open Font License), vendored in `app/static/fonts`. Code: MIT. The dashboard runs on a local test chain and the public run on Ethereum Sepolia; "ETH" amounts are test values.
 
 ## Data notes
 

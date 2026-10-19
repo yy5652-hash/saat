@@ -1,0 +1,288 @@
+{
+  "network": "sepolia",
+  "chain_id": 11155111,
+  "day": "2025-07-10",
+  "contracts": {
+    "SaatRegistry": "0x616F40B710dD84ad0d3a7a347EF2ff252AEB2F4A",
+    "SaatMarket": "0xF2aDeEBA6DE1B5d68Eb9181658B6C666F285AA0D"
+  },
+  "explorer": {
+    "registry": "https://sepolia.etherscan.io/address/0x616F40B710dD84ad0d3a7a347EF2ff252AEB2F4A",
+    "market": "https://sepolia.etherscan.io/address/0xF2aDeEBA6DE1B5d68Eb9181658B6C666F285AA0D",
+    "blockscout_registry": "https://eth-sepolia.blockscout.com/address/0x616F40B710dD84ad0d3a7a347EF2ff252AEB2F4A"
+  },
+  "wallets": {
+    "operator": "0xf464574CF3ad178D4b8cb757E4270e8B417cD891",
+    "hotel": "0xd1edb131164FE7f3cf14A914AA62a37044E25B2e",
+    "campus": "0x75491e9a279c254AD62e99866c66A89B2a911067"
+  },
+  "claim_summary": {
+    "hotel": {
+      "load_wh": 6196400,
+      "matched_wh": 5242618,
+      "cfe": 0.846
+    },
+    "campus": {
+      "load_wh": 2652800,
+      "matched_wh": 2197681,
+      "cfe": 0.8284
+    }
+  },
+  "mismatch": {
+    "reverted": true,
+    "error": "HourMismatch",
+    "certificate": "12:00 solar",
+    "load_hour": "21:00"
+  },
+  "transactions": [
+    {
+      "method": "deploy SaatRegistry",
+      "sender": "operator",
+      "tx": "0x188e9e6d3bbdca95275164df943e296911c4fe54bce54d0fa00e83d64fdbbb42",
+      "gas": 21464392,
+      "fee_wei": 343430272,
+      "block": 11944488,
+      "url": "https://sepolia.etherscan.io/tx/0x188e9e6d3bbdca95275164df943e296911c4fe54bce54d0fa00e83d64fdbbb42"
+    },
+    {
+      "method": "deploy SaatMarket",
+      "sender": "operator",
+      "tx": "0x1c4383c06f09144485619c59328511bb9492be68d1aa4a823a9c7c71b225288c",
+      "gas": 8174366,
+      "fee_wei": 130789856,
+      "block": 11944491,
+      "url": "https://sepolia.etherscan.io/tx/0x1c4383c06f09144485619c59328511bb9492be68d1aa4a823a9c7c71b225288c"
+    },
+    {
+      "method": "transfer ETH",
+      "sender": "operator",
+      "tx": "0xef221bab726cc5fdaa6d0691d20bd0340806a883a971523dee8aa086f8c112b1",
+      "gas": 204600,
+      "fee_wei": 3273600,
+      "block": 11944492,
+      "url": "https://sepolia.etherscan.io/tx/0xef221bab726cc5fdaa6d0691d20bd0340806a883a971523dee8aa086f8c112b1"
+    },
+    {
+      "method": "transfer ETH",
+      "sender": "operator",
+      "tx": "0xa04441fda75a650e628224548b9163b3acaa2a8e3b1f68fc883778decf2a489a",
+      "gas": 204600,
+      "fee_wei": 3273600,
+      "block": 11944493,
+      "url": "https://sepolia.etherscan.io/tx/0xa04441fda75a650e628224548b9163b3acaa2a8e3b1f68fc883778decf2a489a"
+    },
+    {
+      "method": "setIssuer",
+      "sender": "operator",
+      "tx": "0x6e0f9defafed4b1cd6d383021549c3cb0dd778b82a7ae4727bfe3e358380ae79",
+      "gas": 129909,
+      "fee_wei": 2078544,
+      "block": 11944497,
+      "url": "https://sepolia.etherscan.io/tx/0x6e0f9defafed4b1cd6d383021549c3cb0dd778b82a7ae4727bfe3e358380ae79"
+    },
+    {
+      "method": "setZoneOffset",
+      "sender": "operator",
+      "tx": "0x6a1e3bcdcf80bae464e5e3c311e33ad1a0733443672d102399f6c7fd0cdb1762",
+      "gas": 129547,
+      "fee_wei": 2072752,
+      "block": 11944498,
+      "url": "https://sepolia.etherscan.io/tx/0x6a1e3bcdcf80bae464e5e3c311e33ad1a0733443672d102399f6c7fd0cdb1762"
+    },
+    {
+      "method": "registerDevice",
+      "sender": "operator",
+      "tx": "0x6ad31a227afb4979f6d9c72dc5c5d224fc3a6780827da0d80df92baea0df4f3d",
+      "gas": 353009,
+      "fee_wei": 5648144,
+      "block": 11944499,
+      "url": "https://sepolia.etherscan.io/tx/0x6ad31a227afb4979f6d9c72dc5c5d224fc3a6780827da0d80df92baea0df4f3d"
+    },
+    {
+      "method": "registerDevice",
+      "sender": "operator",
+      "tx": "0x647711ed234a6fc8e8959b3ae7e8d89057aa5c5395150f5ac9a8034135c2e836",
+      "gas": 353009,
+      "fee_wei": 5648144,
+      "block": 11944500,
+      "url": "https://sepolia.etherscan.io/tx/0x647711ed234a6fc8e8959b3ae7e8d89057aa5c5395150f5ac9a8034135c2e836"
+    },
+    {
+      "method": "registerMeter",
+      "sender": "operator",
+      "tx": "0x5565ec306177b822ad860ea50ca334950ffb27e9652c315c6e8e4cfcf5a72478",
+      "gas": 350933,
+      "fee_wei": 5614928,
+      "block": 11944501,
+      "url": "https://sepolia.etherscan.io/tx/0x5565ec306177b822ad860ea50ca334950ffb27e9652c315c6e8e4cfcf5a72478"
+    },
+    {
+      "method": "registerMeter",
+      "sender": "operator",
+      "tx": "0x551814ced5f39fce9ec6a7a9ac901b6d667cecfa0638a66e51f23741e8ce3afd",
+      "gas": 350933,
+      "fee_wei": 5614928,
+      "block": 11944503,
+      "url": "https://sepolia.etherscan.io/tx/0x551814ced5f39fce9ec6a7a9ac901b6d667cecfa0638a66e51f23741e8ce3afd"
+    },
+    {
+      "method": "commitGeneration",
+      "sender": "operator",
+      "tx": "0xec45d4b9bb342e7ea480bb83e5bd1c147acef1e2e5a7069a315ac74158b9369c",
+      "gas": 357090,
+      "fee_wei": 5713440,
+      "block": 11944504,
+      "url": "https://sepolia.etherscan.io/tx/0xec45d4b9bb342e7ea480bb83e5bd1c147acef1e2e5a7069a315ac74158b9369c"
+    },
+    {
+      "method": "mintMany",
+      "sender": "operator",
+      "tx": "0xfcc77ac415038c1a367044dab95253f40afc2ae5357d6e74e927bf3bd14ec61e",
+      "gas": 3770459,
+      "fee_wei": 60327344,
+      "block": 11944505,
+      "url": "https://sepolia.etherscan.io/tx/0xfcc77ac415038c1a367044dab95253f40afc2ae5357d6e74e927bf3bd14ec61e"
+    },
+    {
+      "method": "commitGeneration",
+      "sender": "operator",
+      "tx": "0x272d492088a3e15cf2fb3421bf978e06c15a1f89a6dde0e459c438739b746d66",
+      "gas": 357090,
+      "fee_wei": 5713440,
+      "block": 11944506,
+      "url": "https://sepolia.etherscan.io/tx/0x272d492088a3e15cf2fb3421bf978e06c15a1f89a6dde0e459c438739b746d66"
+    },
+    {
+      "method": "mintMany",
+      "sender": "operator",
+      "tx": "0xec3ce153d455be220ddb3433ffa80ccb6dcf6f55342ff008889774d4df34afcc",
+      "gas": 4470791,
+      "fee_wei": 71532656,
+      "block": 11944507,
+      "url": "https://sepolia.etherscan.io/tx/0xec3ce153d455be220ddb3433ffa80ccb6dcf6f55342ff008889774d4df34afcc"
+    },
+    {
+      "method": "safeBatchTransferFrom",
+      "sender": "operator",
+      "tx": "0xf3e3c9407fad24dadf4928a07aee8a80d8f2062adf13401775dbdf4447d5b56a",
+      "gas": 2013730,
+      "fee_wei": 32219680,
+      "block": 11944508,
+      "url": "https://sepolia.etherscan.io/tx/0xf3e3c9407fad24dadf4928a07aee8a80d8f2062adf13401775dbdf4447d5b56a"
+    },
+    {
+      "method": "safeBatchTransferFrom",
+      "sender": "operator",
+      "tx": "0x6deda8e2235c9509cab0afd0173e690e95a9f29c0faf105ad29ea79759df0950",
+      "gas": 2013694,
+      "fee_wei": 32219104,
+      "block": 11944509,
+      "url": "https://sepolia.etherscan.io/tx/0x6deda8e2235c9509cab0afd0173e690e95a9f29c0faf105ad29ea79759df0950"
+    },
+    {
+      "method": "safeBatchTransferFrom",
+      "sender": "operator",
+      "tx": "0x2290f91b8f31db110bbfd76c1954b1c7a5c96b098a5eee049140318d6079375a",
+      "gas": 2386475,
+      "fee_wei": 40570075,
+      "block": 11944510,
+      "url": "https://sepolia.etherscan.io/tx/0x2290f91b8f31db110bbfd76c1954b1c7a5c96b098a5eee049140318d6079375a"
+    },
+    {
+      "method": "safeBatchTransferFrom",
+      "sender": "operator",
+      "tx": "0xdd14d73026d97037d14fb25daba3c998c142da268a1284d61845607952ba4e0a",
+      "gas": 2386415,
+      "fee_wei": 40569055,
+      "block": 11944511,
+      "url": "https://sepolia.etherscan.io/tx/0xdd14d73026d97037d14fb25daba3c998c142da268a1284d61845607952ba4e0a"
+    },
+    {
+      "method": "setApprovalForAll",
+      "sender": "operator",
+      "tx": "0x18fa07b9febd2cd357665da5ebfff27ca7e7036ce80036d9a35154969721ebc6",
+      "gas": 128226,
+      "fee_wei": 2179842,
+      "block": 11944512,
+      "url": "https://sepolia.etherscan.io/tx/0x18fa07b9febd2cd357665da5ebfff27ca7e7036ce80036d9a35154969721ebc6"
+    },
+    {
+      "method": "listBatch",
+      "sender": "operator",
+      "tx": "0x61022509cb3acd654d9045985a41511cf27315b9a8e24e0d268e0b77e92153c2",
+      "gas": 9050662,
+      "fee_wei": 144810592,
+      "block": 11944514,
+      "url": "https://sepolia.etherscan.io/tx/0x61022509cb3acd654d9045985a41511cf27315b9a8e24e0d268e0b77e92153c2"
+    },
+    {
+      "method": "listBatch",
+      "sender": "operator",
+      "tx": "0x4d544ca245d874c37338582a39e86ef9ee78af353dc648cd5582ec84f5cc36ff",
+      "gas": 10623110,
+      "fee_wei": 169969760,
+      "block": 11944515,
+      "url": "https://sepolia.etherscan.io/tx/0x4d544ca245d874c37338582a39e86ef9ee78af353dc648cd5582ec84f5cc36ff"
+    },
+    {
+      "method": "buyBatch",
+      "sender": "hotel",
+      "tx": "0x99c6c0471fa00195c7d84225679af0459c0ee1f8e2991e2e97dbf7452b8f91e2",
+      "gas": 885046,
+      "fee_wei": 14160736,
+      "block": 11944516,
+      "url": "https://sepolia.etherscan.io/tx/0x99c6c0471fa00195c7d84225679af0459c0ee1f8e2991e2e97dbf7452b8f91e2"
+    },
+    {
+      "method": "buyBatch",
+      "sender": "campus",
+      "tx": "0xa97b7520e0c847281cdcef9a6b194b68166fe060f582447e0cef03382a2466ca",
+      "gas": 1023989,
+      "fee_wei": 16383824,
+      "block": 11944517,
+      "url": "https://sepolia.etherscan.io/tx/0xa97b7520e0c847281cdcef9a6b194b68166fe060f582447e0cef03382a2466ca"
+    },
+    {
+      "method": "commitConsumption",
+      "sender": "operator",
+      "tx": "0x06f7682e5cc60b044bec845e7450de59129920fad6a4decba6ab5b70a5c6ad4f",
+      "gas": 577701,
+      "fee_wei": 9243216,
+      "block": 11944518,
+      "url": "https://sepolia.etherscan.io/tx/0x06f7682e5cc60b044bec845e7450de59129920fad6a4decba6ab5b70a5c6ad4f"
+    },
+    {
+      "method": "settleDay",
+      "sender": "campus",
+      "tx": "0xf09180c33fbecfffc5936379f2047422d33ee70d4fe6c2c8e801066ca8309ab5",
+      "gas": 3414245,
+      "fee_wei": 54627920,
+      "block": 11944519,
+      "url": "https://sepolia.etherscan.io/tx/0xf09180c33fbecfffc5936379f2047422d33ee70d4fe6c2c8e801066ca8309ab5"
+    },
+    {
+      "method": "commitConsumption",
+      "sender": "operator",
+      "tx": "0x98b080711928a6a38a891fcd7565b2b62a322ae10033b8816f55646138793910",
+      "gas": 577701,
+      "fee_wei": 9243216,
+      "block": 11944520,
+      "url": "https://sepolia.etherscan.io/tx/0x98b080711928a6a38a891fcd7565b2b62a322ae10033b8816f55646138793910"
+    },
+    {
+      "method": "settleDay",
+      "sender": "hotel",
+      "tx": "0x9f94476a99f1df8b7a39841b233596566a94b1dc7c8f5d3756ff9eea6f1a6bca",
+      "gas": 3449225,
+      "fee_wei": 55187600,
+      "block": 11944521,
+      "url": "https://sepolia.etherscan.io/tx/0x9f94476a99f1df8b7a39841b233596566a94b1dc7c8f5d3756ff9eea6f1a6bca"
+    }
+  ],
+  "total_gas": 79200947,
+  "total_fee_eth": 1.272116268e-09,
+  "verify": [
+    "forge verify-contract --verifier sourcify --chain sepolia 0x616F40B710dD84ad0d3a7a347EF2ff252AEB2F4A src/SaatRegistry.sol:SaatRegistry --constructor-args $(cast abi-encode 'constructor(address)' 0xf464574CF3ad178D4b8cb757E4270e8B417cD891)",
+    "forge verify-contract --verifier sourcify --chain sepolia 0xF2aDeEBA6DE1B5d68Eb9181658B6C666F285AA0D src/SaatMarket.sol:SaatMarket --constructor-args $(cast abi-encode 'constructor(address)' 0x616F40B710dD84ad0d3a7a347EF2ff252AEB2F4A)"
+  ]
+}
