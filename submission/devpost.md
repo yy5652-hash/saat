@@ -1,6 +1,6 @@
 # Devpost submission draft: Saat
 
-> Draft for review. Nothing has been submitted. Links marked TODO are filled in once the repo is public and the video is uploaded.
+> Saved on Devpost as a draft (submission 1246021, 4 of 5 steps). Final submission waits for the submission window on 25 October.
 
 **Project name:** Saat: hourly proof for clean energy
 
@@ -12,8 +12,8 @@
 **Built with:** solidity, foundry, openzeppelin, erc-1155, merkle-trees, python, scikit-learn, pvlib, web3.py, fastapi, chart.js, anvil, sepolia, epias, iea, ember, eia-930, era5, open-meteo, nrel-pvdaq
 
 **Links:**
-- Code: https://github.com/yy5652-hash/saat (TODO: make public)
-- Demo video: TODO (YouTube, 4:32)
+- Code: https://github.com/yy5652-hash/saat
+- Demo video: https://youtu.be/QY4rjnAfnn0 (YouTube, unlisted, 4:32)
 - Live on Ethereum Sepolia: SaatRegistry https://sepolia.etherscan.io/address/0x616F40B710dD84ad0d3a7a347EF2ff252AEB2F4A (source verified on Sourcify)
 - Prototype: runs locally with `uv run uvicorn app.server:app` (instructions in the README)
 

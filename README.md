@@ -10,6 +10,8 @@ Companies say they run on "100% renewable" electricity because they bought certi
 - an **AI day-ahead planner** buys the hours a consumer will be short of and moves flexible load into surplus hours;
 - **hourly retirement** burns a certificate only against the consumer's metered load in the same hour and the same grid zone, and computes the hourly carbon-free score on-chain.
 
+**Demo video (4:32):** https://youtu.be/QY4rjnAfnn0
+
 **Live on Ethereum Sepolia:** [SaatRegistry](https://sepolia.etherscan.io/address/0x616F40B710dD84ad0d3a7a347EF2ff252AEB2F4A) and [SaatMarket](https://sepolia.etherscan.io/address/0xF2aDeEBA6DE1B5d68Eb9181658B6C666F285AA0D), source verified on [Sourcify](https://repo.sourcify.dev/11155111/0x616F40B710dD84ad0d3a7a347EF2ff252AEB2F4A). The demo day ran there in 27 transactions; `claimSummary(7, 20279, 20279)` returns the hotel's 84.6% (8460 basis points).
 
 **Track:** Renewable Energy & Energy Trading (renewable certificate tracking, P2P trading, tokenized incentives). It also serves Carbon Markets & Emissions Transparency (smart contracts that prevent double counting).
