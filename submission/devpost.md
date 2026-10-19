@@ -15,11 +15,26 @@
 - Code: https://github.com/yy5652-hash/saat
 - Demo video: https://youtu.be/QY4rjnAfnn0 (YouTube, unlisted, 4:32)
 - Live on Ethereum Sepolia: SaatRegistry https://sepolia.etherscan.io/address/0x616F40B710dD84ad0d3a7a347EF2ff252AEB2F4A (source verified on Sourcify)
-- Prototype: runs locally with `uv run uvicorn app.server:app` (instructions in the README)
+- Try it in the browser: https://yy5652-hash.github.io/saat/ (the dashboard replays a recorded run and reads the hotel's score live from Sepolia)
+- Run it locally: `uv run uvicorn app.server:app` (instructions in the README)
 
 ---
 
 ## About the project
+
+### Track: Renewable Energy & Energy Trading
+Saat is built for this track's three themes:
+- **Renewable certificate tracking:** every metered hour becomes an ERC-1155 certificate, committed as one Merkle root per plant-day, minted once, and retired only against load in the same hour and zone.
+- **P2P trading:** generators list each surplus hour in escrow on SaatMarket, and buyers take the hours they are short of.
+- **Tokenized incentives:** each hour is its own token with its own price. Hours with no sun and little wind are priced higher, so the market rewards whoever supplies those hours or moves load out of them.
+
+It also serves Carbon Markets & Emissions Transparency: the hourly score is computed on-chain, and the contract refuses double issuance and double claims.
+
+### In short
+- **The problem:** on Türkiye's real 2025 grid, "100% renewable" certificates match only 72% of electricity in the same hour. The rest, 128 kg CO₂e per MWh, is reported as zero.
+- **Saat:** AI-verified hourly certificates, traded peer to peer, retired on-chain only against same-hour load.
+- **The proof:** live on Ethereum Sepolia, where `claimSummary` returns the hotel's 84.6%. The AI verifier blocks fraud a capacity check misses on a real 4.7 MW plant. Over all of 2025 the hotel goes from 63% to 83% matched hour by hour, and the grid emissions of its uncovered hours fall from 281 t to 133 t CO₂e.
+- **Try it:** https://yy5652-hash.github.io/saat/ in any browser, the video, and the open-source repo.
 
 ### Inspiration
 Türkiye hosts COP31 in Antalya this November. Antalya's hotels, like data centres and factories everywhere, can call themselves "100% renewable" by buying certificates equal to their annual use. But a solar megawatt-hour from a June noon did not power a hotel at 9 p.m. in July. We wanted to measure how big that gap really is, and build the infrastructure that closes it: certificates per hour, which can be checked, traded and claimed honestly.
@@ -52,7 +67,7 @@ Türkiye hosts COP31 in Antalya this November. Antalya's hotels, like data centr
   - with AI day-ahead shifting: 67.5%;
   - plus buying its forecast shortfall on the hourly market: **82.8%**, buying 18% more certificates, only in the hours it is short.
 
-  Its median day is 85%, so the demo day is typical, not lucky. The wind forecaster's error is 4.9% of capacity, against 11.2% for persistence. Even with access to only a quarter of the plants' spare output, the community reaches 77.6%.
+  Under annual accounting the hotel reports 0 t CO₂e. Counted hour by hour against Türkiye's real 2025 grid intensity, the grid power it uses in hours its certificates do not cover carries **281 t CO₂e** a year; with Saat's planner and market, **133 t**, 53% less. Its median day is 85%, so the demo day is typical, not lucky. The wind forecaster's error is 4.9% of capacity, against 11.2% for persistence. Even with access to only a quarter of the plants' spare output, the community reaches 77.6%.
 - **Demo day (10 July 2025), live on Ethereum Sepolia.** The hotel's contract alone covers 59.9% of its load hour by hour. After trading and planning, the score computed on-chain is **84.6%**: 27 transactions, contracts source-verified on Sourcify, and `claimSummary` returns 8460 basis points for anyone to check.
 
 ### Who uses it, and how it scales
@@ -62,7 +77,7 @@ Türkiye hosts COP31 in Antalya this November. Antalya's hotels, like data centr
 - **Scale:** one transaction per plant per day, lazy minting, and plain Solidity/OpenZeppelin deployable on any EVM chain, including low-fee rollups or a registry-run permissioned network. Measured gas on Anvil: commit 99k per plant-day; a consumer's whole day settles in one transaction (1.17M gas for 24 hours and 35 retirements, 30% less than hour by hour).
 
 ### How we built it
-- **Contracts:** Solidity 0.8.28 with OpenZeppelin 5.4 (ERC-1155, MerkleProof, ReentrancyGuard), tested with Foundry. 25 tests, including a fuzz test that matched energy never exceeds load.
+- **Contracts:** Solidity 0.8.28 with OpenZeppelin 5.4 (ERC-1155, MerkleProof, ReentrancyGuard), tested with Foundry in CI. 25 tests, including a fuzz test that matched energy never exceeds load.
 - **Off-chain:** a Python Merkle builder that is byte-compatible with the contracts, and a web3.py client that signs locally, for Anvil and public testnets (`scripts/public_chain_day.py`).
 - **AI:** pvlib physics features, scikit-learn quantile gradient boosting for the verifier and gradient boosting for the planner. 21 Python tests, including an end-to-end run on a local chain.
 - **Data:**
@@ -70,7 +85,7 @@ Türkiye hosts COP31 in Antalya this November. Antalya's hotels, like data centr
   - EIA-930 six-month files (2025);
   - PVDAQ via the DOE Open Energy Data Initiative;
   - ERA5 reanalysis and the previous-day forecast archive via Open-Meteo.
-- **Dashboard:** a FastAPI server and a dark "control room" dashboard. Its signature 24-hour ring shows each hour's certificates against load, and it runs a whole market day on a fresh chain.
+- **Dashboard:** a FastAPI server and a dark "control room" dashboard, also published as a static page that replays a recorded run and reads the Sepolia contract from the browser. Its signature 24-hour ring shows each hour's certificates against load, and it runs a whole market day on a fresh chain.
 
 ### Challenges
 - **Proving the gap.** Annual claims and hourly matching are easy to talk about but need real hourly data. We processed every 2025 EIA-930 hour for 22 regions.

@@ -10,7 +10,9 @@ Companies say they run on "100% renewable" electricity because they bought certi
 - an **AI day-ahead planner** buys the hours a consumer will be short of and moves flexible load into surplus hours;
 - **hourly retirement** burns a certificate only against the consumer's metered load in the same hour and the same grid zone, and computes the hourly carbon-free score on-chain.
 
-**Demo video (4:32):** https://youtu.be/QY4rjnAfnn0
+[![tests](https://github.com/yy5652-hash/saat/actions/workflows/tests.yml/badge.svg)](https://github.com/yy5652-hash/saat/actions/workflows/tests.yml)
+
+**Demo video (4:32):** https://youtu.be/QY4rjnAfnn0 · **Try it in the browser, no install:** https://yy5652-hash.github.io/saat/ (the dashboard replays a recorded run and reads the hotel's score live from Sepolia)
 
 **Live on Ethereum Sepolia:** [SaatRegistry](https://sepolia.etherscan.io/address/0x616F40B710dD84ad0d3a7a347EF2ff252AEB2F4A) and [SaatMarket](https://sepolia.etherscan.io/address/0xF2aDeEBA6DE1B5d68Eb9181658B6C666F285AA0D), source verified on [Sourcify](https://repo.sourcify.dev/11155111/0x616F40B710dD84ad0d3a7a347EF2ff252AEB2F4A). The demo day ran there in 27 transactions; `claimSummary(7, 20279, 20279)` returns the hotel's 84.6% (8460 basis points).
 
@@ -138,6 +140,7 @@ Both consumers hold certificates equal to 100% of their annual use, split half s
 | + AI day-ahead load shifting (previous-day forecasts) | 67.5% |
 | + hourly market (buys 18% more certificates, only in short hours) | **82.8%** |
 
+- **Emissions the annual claim hides:** under annual accounting the hotel reports 0 t CO₂e. Counted hour by hour against Türkiye's real 2025 grid intensity (EPİAŞ), the grid power it uses in hours its certificates do not cover carries **281 t CO₂e** a year. With the AI shift and the hourly market that falls to **133 t**, 53% less; the load shift alone takes off 35 t.
 - **Typical, not lucky:** the hotel's median day is 85% (P10 57%, P90 99.5%). Summer averages 85% and winter 76.5%. The same model gives 85.3% for 10 July 2025; the live demo shows 84.6%.
 - **Planner value:** for the hotel and campus together, without the market, shifting recovers 76% of what perfect foresight would (64.4% → 69.7%, against a 70.8% bound).
 - **Market access:** the community does not need the whole market. With 10%, 25%, 50% or all of the plants' spare output on offer, it reaches 74.1%, 77.6%, 80.6% and 83.2%.
@@ -165,7 +168,9 @@ The hotel scores 84.6% and the campus 82.8%, exactly as on the local chain.
 
 ## Run it
 
-Requirements: macOS or Linux, [uv](https://docs.astral.sh/uv/), [Foundry](https://book.getfoundry.sh/) (`forge`, `anvil`).
+To look without installing anything, open **https://yy5652-hash.github.io/saat/**: the same dashboard, replaying a recorded run in the browser, with a button that reads the hotel's score live from the Sepolia contract.
+
+To run it yourself: macOS or Linux, [uv](https://docs.astral.sh/uv/), [Foundry](https://book.getfoundry.sh/) (`forge`, `anvil`).
 
 ```bash
 git clone --recursive https://github.com/yy5652-hash/saat && cd saat
@@ -214,6 +219,8 @@ saat/           merkle (byte-compatible with Solidity), chain client, verifier, 
 analysis/       the three studies; results/ holds their outputs
 app/            FastAPI server and dashboard (Chart.js and fonts vendored, works offline)
 tests/          Python tests, including an end-to-end run on Anvil
+scripts/        the Sepolia run, the replay recording and the static build for GitHub Pages
+.github/        CI (Foundry and pytest) and the Pages deployment
 ```
 
 ## Data and licences
