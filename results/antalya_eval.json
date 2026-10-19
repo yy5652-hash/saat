@@ -65,7 +65,15 @@
     ],
     "summer_jun_aug_cfe": 0.8498,
     "winter_dec_feb_cfe": 0.7652,
-    "demo_day_2025_07_10_model": 0.8526
+    "demo_day_2025_07_10_model": 0.8526,
+    "grid_emissions_t_co2e": {
+      "annual_claim_reports": 0.0,
+      "contract_only": 280.6,
+      "with_ai_shift": 245.6,
+      "with_ai_shift_and_market": 132.6,
+      "no_certificates": 690.0,
+      "note": "emissions of the grid power the hotel uses in hours its certificates do not cover, at the average life-cycle intensity of T\u00fcrkiye's own generation in that hour (imports excluded)"
+    }
   },
   "notes": {
     "supply": "modelled from ERA5 hourly weather at the plant coordinates (pvlib PVWatts; generic turbine curve)",

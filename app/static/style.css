@@ -182,6 +182,17 @@ button.busy::after { content: ""; position: absolute; inset: 0; margin: auto; wi
 @keyframes flash { from { background: rgba(110,231,168,.12); } to { background: transparent; } }
 .run { width: 100%; margin-bottom: 8px; }
 .feed .ghost { width: 100%; }
+.replay-note { font-size: 12px; color: var(--ink-2); background: rgba(242,176,74,.08); border: 1px solid rgba(242,176,74,.35); border-radius: 10px; padding: 8px 11px; margin: 0 0 10px; }
+.sepolia { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+.sepolia p { font-size: 12.5px; margin-bottom: 10px; }
+.sepolia button { width: 100%; }
+.sepolia-out { font-size: 12.5px; color: var(--ink-2); margin: 10px 0 6px; line-height: 1.55; }
+.sepolia-out b { color: var(--ink); }
+.sepolia-out .score { font-family: var(--display); font-size: 22px; font-weight: 700; color: #7fe0ae; }
+.sepolia-out .dim { color: var(--ink-3); font-size: 11px; }
+.sepolia-links { font-size: 12px; color: var(--ink-3); }
+.sepolia-links a { color: var(--gold); text-decoration: none; }
+.sepolia-links a:hover { text-decoration: underline; }
 
 .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--red); color: #fff; padding: 12px 18px; border-radius: 12px; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,.4); z-index: 20; }
 

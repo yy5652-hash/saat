@@ -162,7 +162,49 @@ function toast(msg) {
   setTimeout(() => t.remove(), 4200);
 }
 
+// The static build (GitHub Pages) sets window.SAAT_REPLAY to a recording made by scripts/record_replay.py and answers
+// every call from it: the same responses a real run produced, in the dashboard's order, with no backend.
+const REPLAY = window.SAAT_REPLAY ? fetch(window.SAAT_REPLAY).then((r) => r.json()) : null;
+const replayDone = new Set();
+const NEEDS = {
+  deliver: ["issue-1", "issue-2"], list: ["deliver"], "execute-7": ["list"], "execute-8": ["execute-7"],
+  "settle-7": ["execute-7", "execute-8"], "settle-8": ["settle-7"],
+};
+const STEP_NAMES = { "issue-1": "issue the solar plant", "issue-2": "issue the wind share", deliver: "deliver contracted shares", list: "list the surplus",
+  "execute-7": "buy for the hotel", "execute-8": "buy for the campus", "settle-7": "settle the hotel" };
+
+async function replayApi(path, body) {
+  const R = await REPLAY;
+  const sig = () => [...replayDone].sort().join(",");
+  if (body === undefined) {
+    if (path === "/api/state") return { ...R.states[sig()], done: [...replayDone].sort() };
+    if (path === "/api/book") return R.books[sig()] || [];
+    return R.get[path];
+  }
+  if (path === "/api/reset") { replayDone.clear(); return { ok: true }; }
+  const k = `${path}|${JSON.stringify(Object.fromEntries(Object.entries(body).sort()))}`;
+  const step = { "/api/issue": `issue-${body.device}`, "/api/deliver": "deliver", "/api/list": "list", "/api/execute": `execute-${body.meter}`, "/api/settle": `settle-${body.meter}` }[path];
+  if (step) {
+    if (replayDone.has(step)) throw new Error(`${step} already done for this market day; reset to replay`);
+    const need = new Set(), visit = (x) => (NEEDS[x] || []).forEach((n) => { need.add(n); visit(n); });
+    visit(step);
+    const next = Object.keys(STEP_NAMES).find((x) => need.has(x) && !replayDone.has(x));
+    if (next) throw new Error(`Next step: ${STEP_NAMES[next]}, or press Run the whole day`);
+    replayDone.add(step);
+    return R.post[k];
+  }
+  if (path === "/api/plan" && !replayDone.has("list")) throw new Error("The planner buys from the listed surplus: run steps 1 and 2 first, or press Run the whole day");
+  if (path === "/api/mismatch" && !replayDone.has(`settle-${body.meter}`)) throw new Error("First settle this consumer's day");
+  if (R.post[k]) return R.post[k];
+  const exact = R.post[`${k}|${sig()}`];
+  if (exact) return exact;
+  const any = Object.keys(R.post).filter((x) => x.startsWith(k + "|"));
+  if (any.length) return R.post[any[any.length - 1]];
+  throw new Error("Not part of the recorded run");
+}
+
 async function api(path, body) {
+  if (REPLAY) return replayApi(path, body);
   const res = await fetch(path, body === undefined ? {} : { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.detail || res.statusText);
@@ -185,7 +227,7 @@ let seen = 0;
 async function refresh() {
   const st = await api("/api/state");
   S.state = st;
-  $("chain-text").textContent = `local EVM · chain ${st.chain.chain_id} · block ${st.chain.block}`;
+  $("chain-text").textContent = `${REPLAY ? "recorded run · " : ""}local EVM · chain ${st.chain.chain_id} · block ${st.chain.block}`;
   $("where").textContent = `Antalya · zone TR (UTC+3) · market day ${st.day}`;
   $("addr").innerHTML = `SaatRegistry ${short(st.chain.registry)}<br>SaatMarket&nbsp;&nbsp; ${short(st.chain.market)}`;
   const items = st.log.slice().reverse();
@@ -437,6 +479,31 @@ async function runDay() {
   refresh();
 }
 
+// ------------------------------------------------------------ the same day, live on Ethereum Sepolia
+
+const SEPOLIA = {
+  registry: "0x616F40B710dD84ad0d3a7a347EF2ff252AEB2F4A",
+  rpcs: ["https://ethereum-sepolia-rpc.publicnode.com", "https://sepolia.drpc.org", "https://1rpc.io/sepolia"],
+};
+
+async function readSepolia() {
+  const word = (n) => n.toString(16).padStart(64, "0");
+  const data = "0x84413fe8" + word(7) + word(20279) + word(20279); // claimSummary(uint32 meter, uint32 fromDay, uint32 toDay): the hotel, 10 July 2025
+  for (const rpc of SEPOLIA.rpcs) {
+    try {
+      const call = (method, params) => fetch(rpc, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }) }).then((r) => r.json());
+      const [res, blk] = await Promise.all([call("eth_call", [{ to: SEPOLIA.registry, data }, "latest"]), call("eth_blockNumber", [])]);
+      if (!res.result || res.result.length < 2 + 3 * 64) continue;
+      const [load, matched, bps] = [0, 1, 2].map((k) => Number(BigInt("0x" + res.result.slice(2 + 64 * k, 66 + 64 * k))));
+      $("sepolia-out").innerHTML = `<span class="score">${(bps / 100).toFixed(1)}%</span> hourly score, computed on-chain<br>` +
+        `load <b>${kwh(load / 1000)}</b> · matched in the same hour <b>${kwh(matched / 1000)}</b><br>` +
+        `<span class="dim">claimSummary(7, 20279, 20279) = ${bps} bps · read now from ${new URL(rpc).host}, block ${Number(BigInt(blk.result)).toLocaleString("en-US")}</span>`;
+      return;
+    } catch (e) { /* try the next public endpoint */ }
+  }
+  throw new Error("No public Sepolia endpoint answered; try again in a moment");
+}
+
 // ------------------------------------------------------------ wiring
 
 async function init() {
@@ -455,6 +522,8 @@ async function init() {
   $("btn-mismatch").onclick = (e) => busy(e.target, mismatchClick);
   $("btn-run").onclick = (e) => busy(e.target, runDay);
   $("btn-reset").onclick = (e) => busy(e.target, async () => { await api("/api/reset", {}); location.reload(); });
+  $("btn-sepolia").onclick = (e) => busy(e.target, readSepolia);
+  if (REPLAY) $("replay-note").hidden = false;
   setInterval(refresh, 2500);
 }
 init();

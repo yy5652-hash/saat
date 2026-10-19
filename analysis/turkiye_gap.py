@@ -13,28 +13,15 @@ import json
 import numpy as np
 import pandas as pd
 
-from saat.matching import EMISSION_FACTORS, coverage_for, match
+from saat.matching import coverage_for, match
 from saat.paths import RESULTS
 from saat.scenario import Community
 from saat.sources import eia930, iea_rte
 
-FACTORS = {
-    "coal": EMISSION_FACTORS["coal"], "gas": EMISSION_FACTORS["gas"], "hydro": EMISSION_FACTORS["hydro"],
-    "geothermal": EMISSION_FACTORS["geothermal"], "biomass": 230, "wind": EMISSION_FACTORS["wind"],
-    "solar": EMISSION_FACTORS["solar"], "other_thermal": EMISSION_FACTORS["oil"], "other_combustibles": EMISSION_FACTORS["oil"],
-    "nuclear": EMISSION_FACTORS["nuclear"],
-}
-
-
-def intensity(df: pd.DataFrame) -> pd.Series:
-    g = df[list(FACTORS)].clip(lower=0)
-    return sum(g[k] * v for k, v in FACTORS.items()) / g.sum(axis=1)
-
-
 def main():
     df = iea_rte.load((2024, 2025))
     year = df[(df.index >= "2024-12-31 21:00") & (df.index < "2025-12-31 21:00")]  # 2025 in Türkiye's local time
-    ci = intensity(year).values
+    ci = iea_rte.intensity(year).values
     loads = {"flat 24/7": np.ones(len(year)), "national demand shape": year.demand.values}
     portfolios = {
         "wind+solar": (year.wind + year.solar).values,

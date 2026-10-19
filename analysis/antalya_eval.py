@@ -16,6 +16,7 @@ import pandas as pd
 from saat.paths import RESULTS
 from saat.planner import SupplyForecaster, cfe, market_buy, plan_day_ahead, shift_load, solar_features, wind_features
 from saat.scenario import CAMPUS, HOTEL, SOLAR, WIND, Community, campus_kwh, contracted_supply, hotel_kwh, weather
+from saat.sources import iea_rte
 
 FLEX = {"hotel_kwh": 0.15, "campus_kwh": 0.10}  # laundry, pool pumps, hot water, EV shuttles / pre-cooling
 
@@ -111,6 +112,22 @@ def main():
         "summer_jun_aug_cfe": round(float(m.M[(m.index.month >= 6) & (m.index.month <= 8)].sum() / m.L[(m.index.month >= 6) & (m.index.month <= 8)].sum()), 4),
         "winter_dec_feb_cfe": round(float(m.M[(m.index.month == 12) | (m.index.month <= 2)].sum() / m.L[(m.index.month == 12) | (m.index.month <= 2)].sum()), 4),
         "demo_day_2025_07_10_model": round(float(daily.get(demo_day, np.nan)), 4),
+    }
+    # ---- what the hotel's unmatched hours draw from Türkiye's real 2025 grid (EPİAŞ via IEA, hour by hour)
+    ci = iea_rte.intensity(iea_rte.load((2024, 2025))).reindex(year.index)
+    ci = ci.fillna(ci.mean())
+
+    def grid_t(load, supply):  # kWh x kg/MWh -> t CO2e
+        return round(float(((load - np.minimum(load, supply)) * ci).sum() / 1e6), 1)
+
+    res["hotel"]["grid_emissions_t_co2e"] = {
+        "annual_claim_reports": 0.0,
+        "contract_only": grid_t(year.hotel_kwh, h_own),
+        "with_ai_shift": grid_t(h_load, h_own),
+        "with_ai_shift_and_market": grid_t(h_load, h_own + h_got),
+        "no_certificates": grid_t(year.hotel_kwh, 0 * h_own),
+        "note": "emissions of the grid power the hotel uses in hours its certificates do not cover, at the average "
+                "life-cycle intensity of Türkiye's own generation in that hour (imports excluded)",
     }
     res["notes"] = {
         "supply": "modelled from ERA5 hourly weather at the plant coordinates (pvlib PVWatts; generic turbine curve)",

@@ -4,17 +4,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saat · hourly proof for clean energy</title>
-  <link rel="icon" href="/static/saat.svg">
-  <link rel="stylesheet" href="/static/fonts/fonts.css">
-  <link rel="stylesheet" href="/static/style.css">
-  <script src="/static/vendor/chart.umd.min.js"></script>
+  <link rel="icon" href="static/saat.svg">
+  <link rel="stylesheet" href="static/fonts/fonts.css">
+  <link rel="stylesheet" href="static/style.css">
+  <script src="static/vendor/chart.umd.min.js"></script>
 </head>
 <body>
 <div class="sky" aria-hidden="true"></div>
 
 <header class="top">
   <div class="brand">
-    <img src="/static/saat.svg" alt="" class="logo">
+    <img src="static/saat.svg" alt="" class="logo">
     <div><div class="name">Saat</div><div class="tag">Hourly proof for clean energy</div></div>
   </div>
   <div class="where" id="where">Antalya · zone TR · market day —</div>
@@ -156,10 +156,22 @@
     <div class="feed-head"><span class="pulse"></span>Live chain</div>
     <div class="addr" id="addr"></div>
     <ol id="feed"></ol>
+    <p class="replay-note" id="replay-note" hidden>This page replays a recorded run of the dashboard, so it needs no backend. Every button works; run the steps in order, or press Run the whole day.</p>
     <button id="btn-run" class="run">Run the whole day</button>
     <button id="btn-reset" class="ghost">Reset chain</button>
+    <div class="sepolia">
+      <div class="feed-head">Live on Ethereum Sepolia</div>
+      <p>The same day ran on a public testnet in 27 transactions. The contracts' source is verified on Sourcify.</p>
+      <button id="btn-sepolia" class="secondary">Read the hotel's score from Sepolia</button>
+      <div class="sepolia-out" id="sepolia-out"></div>
+      <div class="sepolia-links">
+        <a href="https://sepolia.etherscan.io/address/0x616F40B710dD84ad0d3a7a347EF2ff252AEB2F4A" target="_blank" rel="noopener">SaatRegistry</a> ·
+        <a href="https://sepolia.etherscan.io/tx/0x9f94476a99f1df8b7a39841b233596566a94b1dc7c8f5d3756ff9eea6f1a6bca" target="_blank" rel="noopener">hotel's settleDay</a> ·
+        <a href="https://repo.sourcify.dev/11155111/0x616F40B710dD84ad0d3a7a347EF2ff252AEB2F4A" target="_blank" rel="noopener">Sourcify</a>
+      </div>
+    </div>
   </aside>
 </main>
-<script src="/static/app.js"></script>
+<script src="static/app.js"></script>
 </body>
 </html>

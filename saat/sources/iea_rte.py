@@ -16,6 +16,7 @@ import time
 import pandas as pd
 import requests
 
+from saat.matching import EMISSION_FACTORS
 from saat.paths import PROCESSED, RAW
 
 API = "https://api.iea.org/rte"
@@ -26,6 +27,19 @@ FUELS = {
     "Other combustibles": "other_combustibles", "Nuclear": "nuclear",
 }
 TR_DIR = RAW / "tr"
+# Life-cycle kg CO2e per MWh by source (IPCC AR5 medians, as in saat.matching); biomass 230, other thermal as oil.
+CARBON = {
+    "coal": EMISSION_FACTORS["coal"], "gas": EMISSION_FACTORS["gas"], "hydro": EMISSION_FACTORS["hydro"],
+    "geothermal": EMISSION_FACTORS["geothermal"], "biomass": 230, "wind": EMISSION_FACTORS["wind"],
+    "solar": EMISSION_FACTORS["solar"], "other_thermal": EMISSION_FACTORS["oil"], "other_combustibles": EMISSION_FACTORS["oil"],
+    "nuclear": EMISSION_FACTORS["nuclear"],
+}
+
+
+def intensity(df: pd.DataFrame) -> pd.Series:
+    """Average intensity of Türkiye's own generation each hour, kg CO2e per MWh (imports excluded)."""
+    g = df[list(CARBON)].clip(lower=0)
+    return sum(g[k] * v for k, v in CARBON.items()) / g.sum(axis=1)
 
 
 def _fetch_year(series: str, year: int) -> list[dict]:
