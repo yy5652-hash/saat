@@ -13,7 +13,7 @@
 
 **Links:**
 - Code: https://github.com/yy5652-hash/saat (TODO: make public)
-- Demo video: TODO (YouTube, 4:22)
+- Demo video: TODO (YouTube, 4:32)
 - Live on Ethereum Sepolia: SaatRegistry https://sepolia.etherscan.io/address/0x616F40B710dD84ad0d3a7a347EF2ff252AEB2F4A (source verified on Sourcify)
 - Prototype: runs locally with `uv run uvicorn app.server:app` (instructions in the README)
 
@@ -92,4 +92,4 @@ Türkiye hosts COP31 in Antalya this November. Antalya's hotels, like data centr
 - The Antalya plants are modelled from real weather, and the hotel and campus loads are synthetic. No real company is depicted.
 - The real-data claims come from the EPİAŞ, EIA-930 and PVDAQ studies.
 - The dashboard runs the day on a local chain; `scripts/public_chain_day.py` ran the same day on Ethereum Sepolia (all transaction links in `results/public_chain_day.json`).
-- The video narration uses a synthetic voice (Chatterbox, MIT licence). Footage is Pexels-licensed stock and NASA imagery, credited in the video.
+- The video narration uses a synthetic voice (Chatterbox, MIT licence, cloning a voice designed with Qwen3-TTS, Apache-2.0). Footage is Pexels-licensed stock and NASA imagery, credited in the video.
